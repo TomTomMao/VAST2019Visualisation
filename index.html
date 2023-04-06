@@ -8,11 +8,23 @@
     <title>Document</title>
   </head>
   <body>
-    <svg id="lineChart"></svg>
-    <svg id="stackedAreaChart"></svg>
+    <div id="lineChart">
+      <div id="lineChartLegend"></div>
+      <div id="lineChartToolTip"></div>
+      <div id="lineChartTitle"></div>
+      <svg id="lineChartSvg"></svg>
+    </div>
+    <div id="stackedAreaChart">
+      <div id="stackedAreaChartLegend"></div>
+      <div id="stackedAreaChartToolTip"></div>
+      <div id="stackedAreaChartTitle"></div>
+      <svg id="stackedAreaChartSvg"></svg>
+    </div>
+    <div id="TimeBrusher"></div>
     <script src="resource/d3.v6.min.js"></script>
     <!-- i got the d3.v6.min.js from the tutorial -->
-    <script src="js/barchart.js"></script>
+    <script src="js/lineChart.js"></script>
+    <script src="js/areaChart.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>
