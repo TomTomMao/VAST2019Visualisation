@@ -26,6 +26,8 @@ const LINE_CHART_LOCATION_COLOURS = [
   "orange",
 ];
 const LINE_CHART_DEFAULT_LEGEND_COLOUR = "white";
+const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_RIGHT = 670;
+const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_LEFT = 100;
 async function main() {
   data = await d3.csv("../data/data_long.csv");
   meanData = await d3.csv("../data/data_mean.csv");

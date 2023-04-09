@@ -202,7 +202,23 @@ class LineChart {
         if (data !== false) {
           // console.log(thisObj.tooltipRender);
           thisObj.tooltipRender.renderTooltip(data);
-
+          // if x < 0.5 * width, tooltip is on the RIGHT side of the svg
+          console.log(x, thisObj.width);
+          if (x < 0.5 * thisObj.width) {
+            console.log("left");
+            tooltipDomElement.style(
+              "left",
+              `${LINECHART_TOOLTIP_MARIGIN_LEFT_AT_RIGHT}px`
+            );
+          }
+          // if x > 0.5 * width, tooltip is on the LEFT side of the svg
+          else {
+            console.log("right");
+            tooltipDomElement.style(
+              "left",
+              `${LINECHART_TOOLTIP_MARIGIN_LEFT_AT_LEFT}px`
+            );
+          }
           // update tooltippoints
           thisObj.points = [];
           thisObj.points.push({
