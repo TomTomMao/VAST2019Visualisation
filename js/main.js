@@ -60,3 +60,19 @@ async function main() {
   lineChart.renderVis();
 }
 main();
+// testToolTip();
+function testToolTip() {
+  let tooltip = new LineChartToolTipRender("#lineChartToolTip");
+  let data = {
+    time: "2020/1/1 0:0",
+    mean: 100,
+    locations: [
+      { name: "location1", MeanDamage: 10, colour: "red" },
+      { name: "location2", MeanDamage: 20, colour: "green" },
+      { name: "location3", MeanDamage: 30, colour: "blue" },
+      { name: "location4", MeanDamage: 40, colour: "yellow" },
+      { name: "location5", MeanDamage: 50, colour: "orange" },
+    ],
+  };
+  console.log(tooltip.renderTooltip(data));
+}

@@ -60,6 +60,41 @@ class LineChart {
     this.timeStart = d3.min(this.data, (d) => d.time);
     this.timeEnd = d3.max(this.data, (d) => d.time);
     this.changeStackedAreaChart = changeStackedAreaChart;
+    this.points = [];
+  }
+  _getTooltipData(x, y) {
+    let thisObj = this;
+    let data = {};
+    let time = thisObj.xScale.invert(x);
+    let bisect = d3.bisector((d) => d.time).left; // reference: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/3_d3_tutorial
+
+    // find the data of filteredMeanData
+    let index = bisect(thisObj.filteredMeanData, time, 1);
+    let leftIndex = thisObj.filteredMeanData[index - 1];
+    let rightIndex = thisObj.filteredMeanData[index];
+    let closerData =
+      time - leftIndex.time > rightIndex.time - time ? rightIndex : leftIndex;
+    data.time = closerData.time;
+    data.mean = closerData.damage_value;
+
+    // find the data of each selected location
+    if (thisObj.locations.length > 0) {
+      data.locations = [];
+    }
+    thisObj.locations.forEach((location) => {
+      let index = bisect(thisObj.locationsData[location], time, 1);
+      let leftIndex = thisObj.locationsData[location][index - 1];
+      let rightIndex = thisObj.locationsData[location][index];
+      let closerData =
+        time - leftIndex.time > rightIndex.time - time ? rightIndex : leftIndex;
+      data.locations.push({
+        name: `location${location}`,
+        meanDamage: closerData.damage_value,
+        colour: thisObj.locationColour[location],
+        time: closerData.time,
+      });
+    });
+    return data;
   }
   initVis() {
     // initialize the axes, scales, svg, chart group, axes groups
@@ -141,7 +176,10 @@ class LineChart {
     // initialize the tooltip
     // reference for this method: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/3_d3_tutorial
     let thisObj = this;
-    let tooltipDomElement = document.getElementById(thisObj.tooltipElementId);
+    let tooltipDomElement = d3.select(thisObj.tooltipElementId);
+    thisObj.tooltipRender = new LineChartToolTipRender(
+      thisObj.tooltipElementId
+    );
     thisObj.trackingArea = thisObj.chart
       .append("rect")
       .attr("width", thisObj.width)
@@ -153,11 +191,45 @@ class LineChart {
       })
       .on("mouseout", () => {
         tooltipDomElement.style("display", "none");
+        // clear tooltippoints
+        thisObj.points = [];
       })
       .on("mousemove", function (event) {
-        console.log(d3.pointer(event, this));
+        // get tooltip data
+        let x = d3.pointer(event)[0];
+        let y = d3.pointer(event)[1];
+        let data = thisObj._getTooltipData(x, y);
+        if (data !== false) {
+          // console.log(thisObj.tooltipRender);
+          thisObj.tooltipRender.renderTooltip(data);
+
+          // update tooltippoints
+          thisObj.points = [];
+          thisObj.points.push({
+            time: data.time,
+            damage_value: data.mean,
+            colour: "black",
+          });
+          if (data.hasOwnProperty("locations")) {
+            data.locations.forEach((location) => {
+              let lengthOfLocationNumber =
+                location.name.length - "location".length;
+              let locationNumber = location.name.slice(-lengthOfLocationNumber);
+              thisObj.points.push({
+                time: location.time,
+                damage_value: location.meanDamage,
+                colour: thisObj.locationColour[locationNumber],
+              });
+            });
+          }
+          thisObj.renderVis();
+          return true;
+        } else {
+          return false;
+        }
       });
   }
+
   updateVis() {
     // update the getter, line generator, scale, legend
     let thisObj = this;
@@ -211,7 +283,7 @@ class LineChart {
     // set colour for the locations
     for (let i = 1; i <= NUMBER_OF_LOCATION; i++) {
       let q = `${thisObj.legendElementId} #locationButton${i} .lineChartColourLegend`;
-      console.log(q);
+      // console.log(q);
       document.querySelector(q).style.backgroundColor =
         thisObj.locationColour[i];
     }
@@ -225,6 +297,7 @@ class LineChart {
     thisObj._renderLocationLines();
     thisObj._renderMeanLine();
     thisObj._renderAxes();
+    thisObj._renderTooltipPoints();
   }
   _renderAxes() {
     // render the axes
@@ -234,7 +307,7 @@ class LineChart {
     let thisObj = this;
 
     // line for the mean line
-    console.log(thisObj.lineGenerator);
+    // console.log(thisObj.lineGenerator);
     thisObj.chart
       .selectAll(".mean-line")
       .data([thisObj.filteredMeanData])
@@ -251,7 +324,7 @@ class LineChart {
     // remove the location lines that not in this.location
     for (let i = 1; i <= NUMBER_OF_LOCATION; i++) {
       if (!thisObj.locations.includes(toString(i))) {
-        console.log(`#line-${i} removed`);
+        // console.log(`#line-${i} removed`);
         d3.select(`#line-${i}`).remove();
       }
     }
@@ -270,8 +343,8 @@ class LineChart {
           .style("stroke", thisObj.locationColour[Number(location)])
           .style("stroke-width", 1) // convert to int
           .on("click", function (event) {
-            console.log(event);
-            console.log(this.id);
+            // console.log(event);
+            // console.log(this.id);
             let location = this.id.split("-")[1];
             thisObj.changeStackedAreaChart(
               location,
@@ -284,8 +357,21 @@ class LineChart {
       return true;
     }
   }
-  _renderToolTip(time) {
-    // update the innerHTML of the this.tooltipElementId
+  _renderTooltipPoints() {
+    // render the tooltip points
+    let thisObj = this;
+    let data = thisObj.points;
+    console.log(data);
+    thisObj.chart
+      .selectAll(".tooltip-point")
+      .data(data)
+      .join("circle")
+      .attr("class", "tooltip-point")
+      .attr("cx", (d) => thisObj.xScale(d.time))
+      .attr("cy", (d) => thisObj.yScale(d.damage_value))
+      .attr("r", 6)
+      .attr("fill", (d) => d.colour)
+      .attr("stroke", "black");
   }
   highLightLine(location, useHighlightColour = true) {
     // set all the other line gray
@@ -400,7 +486,7 @@ class LineChart {
     let locationData = thisObj.filteredData.filter(
       (d) => d.location === location
     );
-    console.log(locationData);
+    // console.log(locationData);
     // aggregate the damage data group by each time point, using mean value
     let damageDataOfLocationByTime = {};
     locationData.forEach((d) => {
@@ -410,7 +496,7 @@ class LineChart {
             d.damage_value;
           damageDataOfLocationByTime[parseTimeReverse(d.time)].count += 1;
         } catch (error) {
-          console.log("error", error);
+          // console.log("error", error);
         }
       } else {
         damageDataOfLocationByTime[parseTimeReverse(d.time)] = {
@@ -419,7 +505,7 @@ class LineChart {
         };
       }
     });
-    console.log("damageDataOfLocationByTime", damageDataOfLocationByTime);
+    // console.log("damageDataOfLocationByTime", damageDataOfLocationByTime);
     let damageDataOfLocationByTimeArray = [];
     for (let time in damageDataOfLocationByTime) {
       damageDataOfLocationByTimeArray.push({

@@ -23,8 +23,14 @@ body {
 }
 
 
+/* line chart tooltip */
+#lineChartToolTip {
+  position: absolute;
+  background: white;
+  border: black 1px solid;
+  display: hidden;
+}
 
-  
 /* linechart legend */
 .line-chart-legend {
   width: 20px;
