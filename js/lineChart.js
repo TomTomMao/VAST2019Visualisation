@@ -112,12 +112,13 @@ class LineChart {
 
     thisObj.xAxis = d3
       .axisBottom(thisObj.xScale)
-      .ticks(6)
+      .ticks(10)
       .tickSizeOuter(0)
-      .tickPadding(10);
+      .tickPadding(10)
+      .tickFormat(d3.timeFormat("%m-%d %H:%M")); // REF: https://github.com/d3/d3-time-format
     thisObj.yAxis = d3
       .axisLeft(thisObj.yScale)
-      .ticks(6)
+      .ticks(10)
       .tickSizeOuter(0)
       .tickPadding(10);
 
