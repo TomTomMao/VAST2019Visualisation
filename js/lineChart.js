@@ -11,25 +11,25 @@ class LineChart {
   // code were constructed with the help of the reference and gitHub copilot as guidance
 
   constructor(
-    parentElement,
-    tooltipElement,
+    parentElementId,
+    tooltipElementId,
     data,
     meanData,
-    legendElement,
+    legendElementId,
     colours,
     changeStackedAreaChart
   ) {
     // initialize the class, save the parameters as properties
-    this.parentElement = parentElement; // id
-    this.tooltipElement = tooltipElement; // id
+    this.parentElementId = parentElementId; // id
+    this.tooltipElementId = tooltipElementId; // id
     this.data = data;
     this.filteredData = data; // data filtered by time range
     this.meanData = meanData; // mean data of the entire dataset
     this.filteredMeanData = meanData; // mean data filtered by time range
     this.locations = [];
     this.locationsData = {};
-    this.legendDomElement = document.querySelector(legendElement); // dom element
-    this.legendElement = legendElement; // id
+    this.legendDomElement = document.querySelector(legendElementId); // dom element
+    this.legendElementId = legendElementId; // id
     this.colours = colours.map((colour) => colour);
     this.usedColours = [];
     this.availableColours = colours.map((colour) => colour);
@@ -88,7 +88,7 @@ class LineChart {
 
     // set svg's width and height
     thisObj.svg = d3
-      .select(thisObj.parentElement)
+      .select(thisObj.parentElementId)
       .attr("width", thisObj.CONTAINER_WIDTH)
       .attr("height", thisObj.CONTAINER_HEIGHT);
 
@@ -109,6 +109,9 @@ class LineChart {
 
     // init legend
     thisObj._initLegend();
+
+    // init tooltip
+    thisObj._initTooltip();
   }
   _initLegend() {
     // add event listeners to the linechart legend buttons
@@ -133,6 +136,27 @@ class LineChart {
         }
       });
     }
+  }
+  _initTooltip() {
+    // initialize the tooltip
+    // reference for this method: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/3_d3_tutorial
+    let thisObj = this;
+    let tooltipDomElement = document.getElementById(thisObj.tooltipElementId);
+    thisObj.trackingArea = thisObj.chart
+      .append("rect")
+      .attr("width", thisObj.width)
+      .attr("height", thisObj.height)
+      .attr("fill", "none")
+      .attr("pointer-events", "all")
+      .on("mouseover", () => {
+        tooltipDomElement.style("display", "block");
+      })
+      .on("mouseout", () => {
+        tooltipDomElement.style("display", "none");
+      })
+      .on("mousemove", function (event) {
+        console.log(d3.pointer(event, this));
+      });
   }
   updateVis() {
     // update the getter, line generator, scale, legend
@@ -180,13 +204,13 @@ class LineChart {
     let thisObj = this;
     // set colours for the selected locations
     // thisObj.locations.forEach((location) => {
-    //   let q = `${thisObj.legendElement} #locationButton${location} .lineChartColourLegend`;
+    //   let q = `${thisObj.legendElementId} #locationButton${location} .lineChartColourLegend`;
     //   document.querySelector(q).style.backgroundColor =
     //     thisObj.locationColour[Number(location)];
     // });
     // set colour for the locations
     for (let i = 1; i <= NUMBER_OF_LOCATION; i++) {
-      let q = `${thisObj.legendElement} #locationButton${i} .lineChartColourLegend`;
+      let q = `${thisObj.legendElementId} #locationButton${i} .lineChartColourLegend`;
       console.log(q);
       document.querySelector(q).style.backgroundColor =
         thisObj.locationColour[i];
@@ -261,7 +285,7 @@ class LineChart {
     }
   }
   _renderToolTip(time) {
-    // update the innerHTML of the this.tooltipElement
+    // update the innerHTML of the this.tooltipElementId
   }
   highLightLine(location, useHighlightColour = true) {
     // set all the other line gray

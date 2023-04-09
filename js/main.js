@@ -41,11 +41,11 @@ async function main() {
   meanData.sort((a, b) => a.time - b.time);
 
   lineChart = new LineChart(
-    (parentElement = "#lineChartSvg"),
-    (tooltipElement = "#lineChartToolTip"),
+    (parentElementId = "#lineChartSvg"),
+    (tooltipElementId = "#lineChartToolTip"),
     (data = data),
     (meanData = meanData),
-    (legendElement = "#lineChartLegendList"),
+    (legendElementId = "#lineChartLegendList"),
     (colours = LINE_CHART_LOCATION_COLOURS),
     (changeStackedAreaChart = function (location, timeStart, timeEnd) {
       document.getElementById(
