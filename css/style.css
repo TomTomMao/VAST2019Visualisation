@@ -1,5 +1,57 @@
-  .mean-line {
-    fill: none;
-    stroke: black;
-    stroke-width: 1px;
-  }
+body {
+  padding: 30px;
+}
+
+
+/* line chart lay out */
+#lineChart {
+  display: flex;
+  flex-direction: row;
+}
+
+/*  line chart svg */
+.mean-line {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+
+.location-line {
+  fill: none;
+  stroke-width: 1px;
+}
+
+
+
+  
+/* linechart legend */
+.line-chart-legend {
+  width: 20px;
+  text-align: center;
+}
+  
+.lineChartLocationButton {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 120px;
+  cursor: pointer;
+  padding-left:1em;
+}
+
+.lineChartLocationButton:hover {
+  border: black 1px solid;
+  border-radius: 5px;
+}
+
+.lineChartColourLegend {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+}
+
+#lineChartLegend {
+  width: 140px;
+  border: black 1px solid;
+}
