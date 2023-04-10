@@ -7,6 +7,7 @@
     <title>test data.js</title>
 </head>
 <body>
+    <h1></h1>
     <script src="../js/data.js"></script>
     <script src="../resource/d3.v6.min.js"></script>
     <script>
@@ -14,6 +15,9 @@
         const MINUTE = 60;
         const HOUR = 60 * MINUTE;
         const DAY = 24 * HOUR;
+        const LOCATION_START = 1;
+        const LOCATION_END = 19;
+        const FACILITIES = ["sewer_and_water","power","roads_and_bridges","medical","buildings"]
         let data;
         let timeSeriesData;
         
@@ -25,16 +29,67 @@
             });
             console.log(data);
             timeSeriesData = new TimeSeriesData(data, "time", "damage_value");
+            let results = []
             if (testCountAgg(data, timeSeriesData)) {
                 console.log("testCountAgg passed");
+                results.push({test: "testCountAgg", result: true})
             } else {
                 console.log("testCountAgg failed");
+                results.push({test: "testCountAgg", result: false})
             }
             if (testMeanAgg(data, timeSeriesData)) {
                 console.log("testMeanAgg passed");
+                results.push({test: "testMeanAgg", result: true})
             } else {
                 console.log("testMeanAgg failed");
+                results.push({test: "testMeanAgg", result: false})
             }
+            // test the data filtered by location
+            for(let i = LOCATION_START; i <= LOCATION_END; i++) {
+                let locData = data.filter(d => d.location == i)
+                if (testCountAggLoc(locData, i)) {
+                    console.log("testCountAggLoc passed for location " + i);
+                    results.push({test: "testCountAggLoc", result: true, location: i})
+                } else {
+                    console.log("testCountAggLoc failed for location " + i);
+                    results.push({test: "testCountAggLoc", result: false, location: i})
+                }
+                if (testMeanAggLoc(locData, i)) {
+                    console.log("testMeanAggLoc passed for location " + i);
+                    results.push({test: "testMeanAggLoc", result: true, location: i})
+                } else {
+                    console.log("testMeanAggLoc failed for location " + i);
+                    results.push({test: "testMeanAggLoc", result: false, location: i})
+                }
+            }
+            
+            // test the data filtered by FACILITY
+            FACILITIES.forEach(facility => {
+                if (testCountAggFac(data, facility)) {
+                    console.log("testCountAggFac passed for facility " + facility);
+                    results.push({test: "testCountAggFac", result: true, facility: facility})
+                } else {
+                    console.log("testCountAggFac failed for facility " + facility);
+                    results.push({test: "testCountAggFac", result: false, facility: facility})
+                }
+                if (testMeanAggFac(data, facility)) {
+                    console.log("testMeanAggFac passed for facility " + facility);
+                    results.push({test: "testMeanAggFac", result: true, facility: facility})
+                } else {
+                    console.log("testMeanAggFac failed for facility " + facility);
+                    results.push({test: "testMeanAggFac", result: false, facility: facility})
+                }
+            });
+            console.log(results);
+            if (results.reduce((a, b) => a && b.result, true)) {
+                // if all tests passed, update the only h1 element in the html
+                document.querySelector("h1").innerHTML = "All tests passed";
+            } else {
+                // if any test failed, update the only h1 element in the html
+                document.querySelector("h1").innerHTML = "Some tests failed";
+            }
+
+
         });
         function testCountAgg(data, timeSeriesData) {
             // test if the count are the same for different interval
@@ -77,12 +132,24 @@
             let sum4hrs = 0;
             let sum1day = 0;
             for (let i = 0; i < intervalData30min.length; i++) {
+                // if the intervalData30minCount is 0, then the regard mean as 0
+                if (intervalData30minCount[i].value == 0) {
+                    continue;
+                }
                 sum30min += intervalData30min[i].value * intervalData30minCount[i].value;
             }
             for (let i = 0; i < intervalData4hrs.length; i++) {
+                // if the intervalData4hrs is 0, then the regard mean as 0
+                if (intervalData4hrsCount[i].value == 0) {
+                    continue;
+                }
                 sum4hrs += intervalData4hrs[i].value * intervalData4hrsCount[i].value;
             }
             for (let i = 0; i < intervalData1day.length; i++) {
+                // if the intervalData1day is 0, then the regard mean as 0
+                if (intervalData1dayCount[i].value == 0) {
+                    continue;
+                }
                 sum1day += intervalData1day[i].value * intervalData1dayCount[i].value;
             }
             let passed = []
@@ -104,6 +171,186 @@
             }
             return passed.reduce((a, b) => a && b, true);
         }
-    </script>
+        function testCountAggLoc(data, loc) {
+            // test if the count are the same for different interval
+            let locData = data.filter(d => d.location == loc)
+            let timeSeriesData = new TimeSeriesData(locData, "time", "damage_value");
+            let locDataLen = locData.length;
+            let intervalData30min = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new CountAggregator());
+            let sum30min = intervalData30min.reduce((a, b) => a + b.value, 0);
+            let intervalData4hrs = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new CountAggregator());
+            let sum4hrs = intervalData4hrs.reduce((a, b) => a + b.value, 0);
+            let intervalData1day = timeSeriesData.getDataAggregatedByInterval(DAY, new CountAggregator());
+            let sum1day = intervalData1day.reduce((a, b) => a + b.value, 0);
+            let passed = []
+            console.log("dataLen:" + locDataLen ,"sum30min: " + sum30min + " sum4hrs: " + sum4hrs + " sum1day: " + sum1day)
+            if (sum30min == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            if (sum4hrs == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            if (sum1day == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            return passed.reduce((a, b) => a && b, true);
+        }
+        function testMeanAggLoc(data, loc) {
+            // test if the mean*length are the same for different intervalLength
+            let locData = data.filter(d => d.location == loc)
+            let timeSeriesData = new TimeSeriesData(locData, "time", "damage_value");
+            let dataTotalDamage = locData.reduce((a, b) => a + b.damage_value, 0);
+            let intervalData30min = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new MeanAggregator());
+            let intervalData30minCount = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new CountAggregator());
+            let intervalData4hrs = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new MeanAggregator());
+            let intervalData4hrsCount = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new CountAggregator());
+            let intervalData1day = timeSeriesData.getDataAggregatedByInterval(DAY, new MeanAggregator());
+            let intervalData1dayCount = timeSeriesData.getDataAggregatedByInterval(DAY, new CountAggregator());
+            let sum30min = 0;
+            let sum4hrs = 0;
+            let sum1day = 0;
+            for (let i = 0; i < intervalData30min.length; i++) {
+                // if the intervalData30minCount is 0, then the regard mean as 0
+                if (intervalData30minCount[i].value == 0) {
+                    continue;
+                }
+                sum30min += intervalData30min[i].value * intervalData30minCount[i].value;
+            }
+            for (let i = 0; i < intervalData4hrs.length; i++) {
+                // if the intervalData4hrs is 0, then the regard mean as 0
+                if (intervalData4hrsCount[i].value == 0) {
+                    continue;
+                }
+                sum4hrs += intervalData4hrs[i].value * intervalData4hrsCount[i].value;
+            }
+            for (let i = 0; i < intervalData1day.length; i++) {
+                // if the intervalData1day is 0, then the regard mean as 0
+                if (intervalData1dayCount[i].value == 0) {
+                    continue;
+                }
+                sum1day += intervalData1day[i].value * intervalData1dayCount[i].value;
+            }
+            let passed = []
+            console.log("dataTotalDamage:" + dataTotalDamage ,"sum30min: " + sum30min + " sum4hrs: " + sum4hrs + " sum1day: " + sum1day)
+            if (sum30min == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                consloe.log("intervalData30min" ,intervalData30min);
+                console.log("intervalData30minCount" ,intervalData30minCount);
+                passed.push(false);
+            }
+            if (sum4hrs == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                console.log("intervalData4hrs" ,intervalData4hrs);
+                console.log("intervalData4hrsCount" ,intervalData4hrsCount);
+                passed.push(false);
+            }
+            if (sum1day == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                console.log("intervalData1day" ,intervalData1day);
+                console.log("intervalData1dayCount" ,intervalData1dayCount);
+                passed.push(false);
+            }
+            return passed.reduce((a, b) => a && b, true);
+        }
+        function testCountAggFac(data, loc) {
+            // test if the count are the same for different interval
+            let locData = data.filter(d => d.facility == loc)
+            let timeSeriesData = new TimeSeriesData(locData, "time", "damage_value");
+            let locDataLen = locData.length;
+            let intervalData30min = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new CountAggregator());
+            let sum30min = intervalData30min.reduce((a, b) => a + b.value, 0);
+            let intervalData4hrs = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new CountAggregator());
+            let sum4hrs = intervalData4hrs.reduce((a, b) => a + b.value, 0);
+            let intervalData1day = timeSeriesData.getDataAggregatedByInterval(DAY, new CountAggregator());
+            let sum1day = intervalData1day.reduce((a, b) => a + b.value, 0);
+            let passed = []
+            console.log("dataLen:" + locDataLen ,"sum30min: " + sum30min + " sum4hrs: " + sum4hrs + " sum1day: " + sum1day)
+            if (sum30min == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            if (sum4hrs == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            if (sum1day == locDataLen) {
+                passed.push(true);
+            } else {
+                passed.push(false);
+            }
+            return passed.reduce((a, b) => a && b, true);
+        }
+        function testMeanAggFac(data, fac) {
+            // test if the mean*length are the same for different intervalLength
+            let locData = data.filter(d => d.facility == fac)
+            let timeSeriesData = new TimeSeriesData(locData, "time", "damage_value");
+            let dataTotalDamage = locData.reduce((a, b) => a + b.damage_value, 0);
+            let intervalData30min = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new MeanAggregator());
+            let intervalData30minCount = timeSeriesData.getDataAggregatedByInterval(30*MINUTE, new CountAggregator());
+            let intervalData4hrs = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new MeanAggregator());
+            let intervalData4hrsCount = timeSeriesData.getDataAggregatedByInterval(4*HOUR, new CountAggregator());
+            let intervalData1day = timeSeriesData.getDataAggregatedByInterval(DAY, new MeanAggregator());
+            let intervalData1dayCount = timeSeriesData.getDataAggregatedByInterval(DAY, new CountAggregator());
+            let sum30min = 0;
+            let sum4hrs = 0;
+            let sum1day = 0;
+            for (let i = 0; i < intervalData30min.length; i++) {
+                // if the intervalData30minCount is 0, then the regard mean as 0
+                if (intervalData30minCount[i].value == 0) {
+                    continue;
+                }
+                sum30min += intervalData30min[i].value * intervalData30minCount[i].value;
+            }
+            for (let i = 0; i < intervalData4hrs.length; i++) {
+                // if the intervalData4hrs is 0, then the regard mean as 0
+                if (intervalData4hrsCount[i].value == 0) {
+                    continue;
+                }
+                sum4hrs += intervalData4hrs[i].value * intervalData4hrsCount[i].value;
+            }
+            for (let i = 0; i < intervalData1day.length; i++) {
+                // if the intervalData1day is 0, then the regard mean as 0
+                if (intervalData1dayCount[i].value == 0) {
+                    continue;
+                }
+                sum1day += intervalData1day[i].value * intervalData1dayCount[i].value;
+            }
+            let passed = []
+            console.log("dataTotalDamage:" + dataTotalDamage ,"sum30min: " + sum30min + " sum4hrs: " + sum4hrs + " sum1day: " + sum1day)
+            if (sum30min == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                consloe.log("intervalData30min" ,intervalData30min);
+                console.log("intervalData30minCount" ,intervalData30minCount);
+                passed.push(false);
+            }
+            if (sum4hrs == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                console.log("intervalData4hrs" ,intervalData4hrs);
+                console.log("intervalData4hrsCount" ,intervalData4hrsCount);
+                passed.push(false);
+            }
+            if (sum1day == dataTotalDamage) {
+                passed.push(true);
+            } else {
+                console.log("intervalData1day" ,intervalData1day);
+                console.log("intervalData1dayCount" ,intervalData1dayCount);
+                passed.push(false);
+            }
+            return passed.reduce((a, b) => a && b, true);
+        }
+</script>
 </body>
 </html>

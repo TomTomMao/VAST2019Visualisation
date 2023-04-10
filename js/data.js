@@ -88,7 +88,7 @@ class TimeSeriesData {
         if(intervalStartTime < endTimeOfFilteredData) {
             intervalTimes.push({timeStart: intervalStartTime, timeEnd: endTimeOfFilteredData});
         }
-        console.log(intervalTimes)
+        // console.log(intervalTimes)
         
         // aggregate the data, left closed and right open
         // assume the filteredData is sorted by time
@@ -129,14 +129,14 @@ class TimeSeriesData {
         let dataInInterval = filteredData.slice(left, right).map((d) => d[thisObj.valueAttrName]);
         let aggregatedValue = aggregator.aggregate(dataInInterval);
         aggregatedData.push({timeStart: intervalTimes[intervalTimes.length - 1].timeStart, timeEnd: intervalTimes[intervalTimes.length - 1].timeEnd, value: aggregatedValue});
-        
+
 
         return aggregatedData;
 
 
     }
 }
-
+// mean and count is tested. the others are not tested
 class Aggregator {
     constructor() {
 

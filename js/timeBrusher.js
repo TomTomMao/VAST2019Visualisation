@@ -1,5 +1,5 @@
 class TimeBrusher {
-    constructor(timeChangerFuncs, parentElementId, data, meanData) {
+    constructor(timeChangerFuncs, parentElementId, data) {
         // timeChangerFuncs is an array of functions that change the time, they are called when the brush is moved
         this.timeChangerFuncs = timeChangerFuncs;
         this.parentElementId = parentElementId;
