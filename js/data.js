@@ -77,7 +77,7 @@ class TimeSeriesData {
         // calculate the start time and end time of each interval
         let intervalTimes = []; // an array of objects: {timeStart: time, timeEnd: time}
         let intervalStartTime = filteredData[0][thisObj.timeAttrName];
-        console.log(intervalStartTime)
+        
         let intervalEndTime = new Date(intervalStartTime.getTime() + intervalLength * 1000);
         let endTimeOfFilteredData = filteredData[filteredData.length - 1][thisObj.timeAttrName];
         while(intervalStartTime < endTimeOfFilteredData && intervalEndTime <= endTimeOfFilteredData) {
@@ -89,13 +89,20 @@ class TimeSeriesData {
             intervalTimes.push({timeStart: intervalStartTime, timeEnd: endTimeOfFilteredData});
         }
         console.log(intervalTimes)
-        return intervalTimes.map((intervalTime) => {
-            // for each interval, aggregate the data
-            let dataInInterval = filteredData.filter((d) => d[thisObj.timeAttrName] >= intervalTime.timeStart && d[thisObj.timeAttrName] < intervalTime.timeEnd);
-            console.log(dataInInterval);
-            console.log(dataInInterval.map((d) => d[thisObj.valueAttrName]));
-            return {timeStart: intervalTime.timeStart, timeEnd: intervalTime.timeEnd, value: aggregator.aggregate(dataInInterval.map((d) => d[thisObj.valueAttrName]))};
-        });
+        // for each interval, aggregate the data, left closed and right open, except the last interval
+        let aggregatedData = [];
+        for(let i = 0; i < intervalTimes.length; i++) {
+            if (i === intervalTimes.length - 1) {
+                let dataInInterval = filteredData.filter((d) => d[thisObj.timeAttrName] >= intervalTimes[i].timeStart && d[thisObj.timeAttrName] <= intervalTimes[i].timeEnd);
+                let aggregatedValue = aggregator.aggregate(dataInInterval.map((d) => d[thisObj.valueAttrName]));
+                aggregatedData.push({timeStart: intervalTimes[i].timeStart, timeEnd: intervalTimes[i].timeEnd, value: aggregatedValue});
+                break;
+            }
+            let dataInInterval = filteredData.filter((d) => d[thisObj.timeAttrName] >= intervalTimes[i].timeStart && d[thisObj.timeAttrName] < intervalTimes[i].timeEnd);
+            let aggregatedValue = aggregator.aggregate(dataInInterval.map((d) => d[thisObj.valueAttrName]));
+            aggregatedData.push({timeStart: intervalTimes[i].timeStart, timeEnd: intervalTimes[i].timeEnd, value: aggregatedValue});
+        }
+        return aggregatedData;
 
 
     }
