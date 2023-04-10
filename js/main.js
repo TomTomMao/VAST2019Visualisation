@@ -1,5 +1,6 @@
 let lineChart;
 let stactAreaChart;
+let timeBrusher; // an area chart for brushing time, which would chagne the time on lineChart and stackedAreaChart
 let data;
 const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
 const parseTimeReverse = function (time) {
@@ -57,6 +58,7 @@ async function main() {
       )} to ${parseTimeReverse(timeEnd)}`;
     })
   );
+
   lineChart.initVis();
   lineChart.updateVis();
   lineChart.renderVis();

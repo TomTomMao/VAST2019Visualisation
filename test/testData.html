@@ -1,0 +1,27 @@
+<!DOCTYPE html><!-- the html head is genereated by  "emmet Abbreviate" VS Code extension-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test data.js</title>
+</head>
+<body>
+    <script src="../js/data.js"></script>
+    <script src="../resource/d3.v6.min.js"></script>
+    <script>
+        const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
+        let data;
+        let timeSeries;
+        d3.csv("../data/data_long.csv").then(function (d) {
+            data = d;
+            data.forEach(function (d) {
+                d.time = parseTime(d.time);
+                d.damage_value = +d.damage_value;
+            });
+            console.log(data);
+            timeSeries = new TimeSeriesData(data, "time", "damage_value");
+        });
+    </script>
+</body>
+</html>
