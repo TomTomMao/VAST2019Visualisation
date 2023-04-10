@@ -1,5 +1,6 @@
 let lineChart;
 let stactAreaChart;
+let barChartContext;
 let data;
 const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
 const parseTimeReverse = function (time) {
@@ -15,6 +16,10 @@ const parseTimeReverse = function (time) {
     time.getUTCMinutes()
   );
 };
+const SECOND = 1;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 const NUMBER_OF_LOCATION = 19;
 const MAX_NUMBER_OF_LOCATION = 5;
 const HIGHLIGHT_COLOUR = "purple";
@@ -28,6 +33,33 @@ const LINE_CHART_LOCATION_COLOURS = [
 const LINE_CHART_DEFAULT_LEGEND_COLOUR = "white";
 const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_RIGHT = 670;
 const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_LEFT = 100;
+const VALID_LOCATION = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+];
+const VALID_FACILITIES = [
+  "sewer_and_water",
+  "power",
+  "roads_and_bridges",
+  "medical,buildings",
+];
 async function main() {
   data = await d3.csv("../data/data_long.csv");
   meanData = await d3.csv("../data/data_mean.csv");
@@ -57,9 +89,27 @@ async function main() {
       )} to ${parseTimeReverse(timeEnd)}`;
     })
   );
+
   lineChart.initVis();
   lineChart.updateVis();
   lineChart.renderVis();
+
+  barChartContext = new BrushableTimeIntervalBarChart(
+    {
+      parentElementId: "#barChartContextSvg",
+      containerWidth: 1000,
+      containerHeight: 100,
+      margin: { top: 20, right: 20, bottom: 30, left: 40 },
+    },
+    (data = data),
+    (timeAttrName = "time"),
+    (valueAttrName = "damage_value"),
+    (callback = console.log),
+    (intervalLength = 15 * MINUTE)
+  );
+  barChartContext.initVis();
+  barChartContext.updateVis();
+  barChartContext.renderVis();
 }
 main();
 // testToolTip();
