@@ -58,7 +58,7 @@ const VALID_FACILITIES = [
   "sewer_and_water",
   "power",
   "roads_and_bridges",
-  "medical,buildings",
+  "medical","buildings"
 ];
 async function main() {
   data = await d3.csv("../data/data_long.csv");
