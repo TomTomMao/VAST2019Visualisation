@@ -270,9 +270,9 @@ class BrushableTimeIntervalBarChart extends BarChart {
         [thisObj.width, thisObj.height],
       ])
       .on("brush", (event) => {
-        let timeStart = thisObj.xScale2.invert(event.selection[0]);
-        let timeEnd = thisObj.xScale2.invert(event.selection[1]);
-        thisObj.callback(timeStart, timeEnd);
+        // let timeStart = thisObj.xScale2.invert(event.selection[0]);
+        // let timeEnd = thisObj.xScale2.invert(event.selection[1]);
+        // thisObj.callback(timeStart, timeEnd);
       })
       .on("end", (event) => {
         let timeStart = thisObj.xScale2.invert(event.selection[0]);
