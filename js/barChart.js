@@ -104,7 +104,16 @@ class BarChart {
       .attr("x", (d) => thisObj.xScale(thisObj.getX(d)))
       .attr("y", (d) => thisObj.yScale(thisObj.getY(d)))
       .attr("width", thisObj.xScale.bandwidth())
-      .attr("height", (d) => thisObj.height - thisObj.yScale(thisObj.getY(d)));
+      .attr("height", (d) => {
+        let height = thisObj.height - thisObj.yScale(thisObj.getY(d));
+        if (typeof height === "number") {
+          console.log("height is a number: ", height)
+          return height;
+        } else {
+          console.log("height is not a number: ", height)
+          return 0;
+        }
+      });
   }
   _renderAxes() {
     let thisObj = this;
@@ -142,6 +151,7 @@ class BrushableTimeIntervalBarChart extends BarChart {
     // facilities: 'all' or a subset of VALID_FACILITIES, an array of strings of facility names
     // aggregation: 'mean' or 'count'
     // validation for location, facility and aggregation
+    console.log(locations)
     if (
       locations == "all" ||
       locations.every((l) => VALID_LOCATION.includes(l))

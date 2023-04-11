@@ -58,7 +58,8 @@ const VALID_FACILITIES = [
   "sewer_and_water",
   "power",
   "roads_and_bridges",
-  "medical,buildings",
+  "medical",
+  "buildings",
 ];
 async function main() {
   data = await d3.csv("../data/data_long.csv");
@@ -129,7 +130,77 @@ function testToolTip() {
   console.log(tooltip.renderTooltip(data));
 }
 
-function barChartContextCallback (timeStart, timeEnd) {
+function barChartContextCallback(timeStart, timeEnd) {
   // console.log("start:", timeStart, "end:", timeEnd);
   lineChart.changeTime(timeStart, timeEnd, true);
+}
+
+function changeBarChartValueType(indexOfSelector) {
+  if (indexOfSelector == 1) {
+    let barChartContextObj = barChartContext;
+    return function (value) {
+      barChartContextObj.changeFilter(
+        barChartContextObj.locationFilter,
+        barChartContextObj.facilityFilter,
+        value
+      );
+    };
+  }
+}
+
+function changeBarChartLocationFilter(indexOfSelector) {
+  if (indexOfSelector == 1) {
+    let barChartContextObj = barChartContext;
+    return function (value) {
+      let locationFilter = [];
+      if (value == "all") {
+        locationFilter = "all";
+      } else {
+        locationFilter = [value];
+      }
+      barChartContextObj.changeFilter(
+        locationFilter,
+        barChartContextObj.facilityFilter,
+        barChartContextObj.aggregationFilter
+      );
+    };
+  }
+}
+
+function changeBarChartIntervalLength(indexOfSelector) {
+  if (indexOfSelector == 1) {
+    let barChartContextObj = barChartContext;
+    return function (value) {
+      const valueMapping = {
+        "15min": 15 * MINUTE,
+        "30min": 30 * MINUTE,
+        "1hour": HOUR,
+        "2hours": 2 * HOUR,
+        "4hours": 4 * HOUR,
+        "8hours": 8 * HOUR,
+        "12hours": 12 * HOUR,
+        "1day": DAY,
+      };
+      barChartContextObj.changeIntervalLength(valueMapping[value]);
+    };
+  }
+}
+
+function changeBarChartFacilityFilter(indexOfSelector) {
+  if (indexOfSelector == 1) {
+    let barChartContextObj = barChartContext;
+    return function (value) {
+      let facilityFilter = [];
+      if (value == "all") {
+        facilityFilter = "all";
+      } else {
+        facilityFilter = [value];
+      }
+      barChartContextObj.changeFilter(
+        barChartContextObj.locationFilter,
+        facilityFilter,
+        barChartContextObj.aggregationFilter
+      );
+    };
+  }
 }

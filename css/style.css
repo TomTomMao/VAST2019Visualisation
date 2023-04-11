@@ -3,6 +3,16 @@ body {
 }
 
 
+/* chart column */
+.chartsColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 600px;
+  
+}
+
+
 /* line chart lay out */
 #lineChart {
   display: flex;
@@ -60,4 +70,10 @@ body {
 #lineChartLegend {
   width: 140px;
   border: black 1px solid;
+}
+
+/* bar chart */
+#barChartContext {
+  display: flex;
+  flex-direction: row;
 }
