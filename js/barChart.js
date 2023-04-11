@@ -132,9 +132,9 @@ class BrushableTimeIntervalBarChart extends BarChart {
     this.callback = callback;
     this.intervalLength = intervalLength; // in seconds
     this.dataToDisplay = this._getDataToDisplay("all", "all", "mean");
-    this.locationFilter = 'all';
-    this.facilityFilter = 'all';
-    this.aggregationFilter = 'mean';
+    this.locationFilter = "all";
+    this.facilityFilter = "all";
+    this.aggregationFilter = "mean";
   }
   _getDataToDisplay(locations, facilities, aggregation) {
     // return a list of data: [{timeStart: timeStart, timeEnd: timeEnd, value: value}, ...}]
@@ -169,9 +169,6 @@ class BrushableTimeIntervalBarChart extends BarChart {
       mean: new MeanAggregator(),
       count: new CountAggregator(),
     };
-    thisObj.locationFilter = locations;
-    thisObj.facilityFilter = facilities;
-    thisObj.aggregationFilter = aggregation;
     if (locations === "all") {
       if (facilities === "all") {
         return new TimeSeriesData(
@@ -217,15 +214,20 @@ class BrushableTimeIntervalBarChart extends BarChart {
       }
     }
   }
+  initVis() {
+    super.initVis();
+    let thisObj = this;
+    thisObj._initBrush();
+  }
   _initScales() {
     super._initScales();
     let thisObj = this;
-    thisObj.xScale2 = d3.scaleTime().range([0, thisObj.width]);
+    thisObj.xScale2 = d3.scaleTime().range([0, thisObj.width]); // scale2 is for axis
   }
   _updateScales() {
     super._updateScales();
     let thisObj = this;
-    thisObj.xScale2.domain(d3.extent(thisObj.dataToDisplay, thisObj.getX));
+    thisObj.xScale2.domain(d3.extent(thisObj.dataToDisplay, thisObj.getX)); // scale2 is for axis
   }
   _initAxes() {
     let thisObj = this;
@@ -247,7 +249,35 @@ class BrushableTimeIntervalBarChart extends BarChart {
       .attr("transform", `translate(0, ${thisObj.height})`);
     thisObj.YAxisG = thisObj.chart.append("g").attr("class", "axis y-axis");
   }
+  _initBrush() {
+    // reference : https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/4_d3_tutorial#brushing-linking
+    let thisObj = this;
+    thisObj.brush = d3
+      .brushX()
+      .extent([
+        [0, 0],
+        [thisObj.width, thisObj.height],
+      ])
+      .on("brush", (event) => {
+        let timeStart = thisObj.xScale2.invert(event.selection[0]);
+        let timeEnd = thisObj.xScale2.invert(event.selection[1]);
+        thisObj.callback(timeStart, timeEnd);
+      })
+      .on("end", (event) => {
+        let timeStart = thisObj.xScale2.invert(event.selection[0]);
+        let timeEnd = thisObj.xScale2.invert(event.selection[1]);
+        thisObj.callback(timeStart, timeEnd);
+      });
+    thisObj.brushG = thisObj.svg
+      .append("g")
+      .attr("class", "brush x-brush")
+      .attr("transform", `translate(${thisObj.margin.left}, ${thisObj.margin.top})`)
+      .call(thisObj.brush);
+  }
   changeFilter(locations, facilities, aggregation) {
+    // locations should be 'all' or a subset of VALID_LOCATION, an array of strings of numbers.
+    // facilities should be 'all' or a subset of VALID_FACILITIES, an array of strings of facility names
+    // aggregation should be 'mean' or 'count'
     let thisObj = this;
     thisObj.dataToDisplay = thisObj._getDataToDisplay(
       locations,
@@ -255,14 +285,19 @@ class BrushableTimeIntervalBarChart extends BarChart {
       aggregation
     );
     if (aggregation == "mean") {
-        thisObj.yAxis.tickFormat  ((d) => d);
+      thisObj.yAxis.tickFormat((d) => d);
     } else {
-        thisObj.yAxis.tickFormat ((d) => d/1000 + "k");
+      thisObj.yAxis.tickFormat((d) => d / 1000 + "k");
     }
+
+    thisObj.locationFilter = locations;
+    thisObj.facilityFilter = facilities;
+    thisObj.aggregationFilter = aggregation;
     thisObj.updateVis();
-    thisObj.renderVis()
+    thisObj.renderVis();
   }
   changeIntervalLength(intervalLength) {
+    // intervalLength: in seconds
     let thisObj = this;
     thisObj.intervalLength = intervalLength;
     thisObj.dataToDisplay = thisObj._getDataToDisplay(

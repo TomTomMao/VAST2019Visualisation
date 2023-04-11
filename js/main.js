@@ -104,7 +104,7 @@ async function main() {
     (data = data),
     (timeAttrName = "time"),
     (valueAttrName = "damage_value"),
-    (callback = console.log),
+    (callback = barChartContextCallback),
     (intervalLength = 15 * MINUTE)
   );
   barChartContext.initVis();
@@ -127,4 +127,9 @@ function testToolTip() {
     ],
   };
   console.log(tooltip.renderTooltip(data));
+}
+
+function barChartContextCallback (timeStart, timeEnd) {
+  // console.log("start:", timeStart, "end:", timeEnd);
+  lineChart.changeTime(timeStart, timeEnd, true);
 }
