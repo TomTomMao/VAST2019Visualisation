@@ -85,14 +85,29 @@ class LineChart {
       let index = bisect(thisObj.locationsData[location], time, 1);
       let leftIndex = thisObj.locationsData[location][index - 1];
       let rightIndex = thisObj.locationsData[location][index];
-      let closerData =
-        time - leftIndex.time > rightIndex.time - time ? rightIndex : leftIndex;
-      data.locations.push({
-        name: `location${location}`,
-        meanDamage: closerData.damage_value,
-        colour: thisObj.locationColour[location],
-        time: closerData.time,
-      });
+      // if the no data at right or left in the chart of the location, push nothing; if only one data at right or left, push the data; if both data at right and left, push the data closer to the mouse
+      if (leftIndex === undefined && rightIndex === undefined) {
+        // push nothing
+      } else if (leftIndex === undefined || rightIndex === undefined) {
+        var closerData = leftIndex === undefined ? rightIndex : leftIndex;
+        data.locations.push({
+          name: `location${location}`,
+          meanDamage: closerData.damage_value,
+          colour: thisObj.locationColour[location],
+          time: closerData.time,
+        });
+      } else {
+        var closerData =
+          time - leftIndex.time > rightIndex.time - time
+            ? rightIndex
+            : leftIndex;
+        data.locations.push({
+          name: `location${location}`,
+          meanDamage: closerData.damage_value,
+          colour: thisObj.locationColour[location],
+          time: closerData.time,
+        });
+      }
     });
     return data;
   }
@@ -214,7 +229,7 @@ class LineChart {
           }
           // if x > 0.5 * width, tooltip is on the LEFT side of the svg
           else {
-            console.log("right");
+            // console.log("right");
             tooltipDomElement.style(
               "left",
               `${LINECHART_TOOLTIP_MARIGIN_LEFT_AT_LEFT}px`
@@ -378,7 +393,7 @@ class LineChart {
     // render the tooltip points
     let thisObj = this;
     let data = thisObj.points;
-    console.log(data);
+    // console.log(data);
     thisObj.chart
       .selectAll(".tooltip-point")
       .data(data)
