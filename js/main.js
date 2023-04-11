@@ -1,6 +1,7 @@
 let lineChart;
 let stactAreaChart;
 let barChartContext;
+let longBarChart;
 let data;
 const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
 const parseTimeReverse = function (time) {
@@ -16,51 +17,7 @@ const parseTimeReverse = function (time) {
     time.getUTCMinutes()
   );
 };
-const SECOND = 1;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
-const NUMBER_OF_LOCATION = 19;
-const MAX_NUMBER_OF_LOCATION = 5;
-const HIGHLIGHT_COLOUR = "purple";
-const LINE_CHART_LOCATION_COLOURS = [
-  "red",
-  "green",
-  "blue",
-  "yellow",
-  "orange",
-];
-const LINE_CHART_DEFAULT_LEGEND_COLOUR = "white";
-const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_RIGHT = 670;
-const LINECHART_TOOLTIP_MARIGIN_LEFT_AT_LEFT = 100;
-const VALID_LOCATION = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-];
-const VALID_FACILITIES = [
-  "sewer_and_water",
-  "power",
-  "roads_and_bridges",
-  "medical",
-  "buildings",
-];
+
 async function main() {
   data = await d3.csv("../data/data_long.csv");
   meanData = await d3.csv("../data/data_mean.csv");
@@ -111,7 +68,31 @@ async function main() {
   barChartContext.initVis();
   barChartContext.updateVis();
   barChartContext.renderVis();
+
+  let longBarChartConfig = (_config = {
+    parentElementId: "#longBarChartLongSvg",
+    containerWidth: 400,
+    containerHeight: 1000,
+    margin: { top: 40, right: 20, bottom: 30, left: 40 },
+  });
+  let longBarChartEncoding = {
+    group: "location",
+    mainValueType: new MeanAggregator(),
+    secondValueType: new StdAggregator(),
+  };
+  longBarChart = new CompositeVerticalAggregatedBarChart(
+    longBarChartConfig,
+    data,
+    longBarChartEncoding,
+    "time",
+    "damage_value"
+  );
+  longBarChart.initVis();
+  longBarChart.updateVis();
+  longBarChart.renderVis();
+  
 }
+
 main();
 // testToolTip();
 function testToolTip() {
@@ -133,6 +114,7 @@ function testToolTip() {
 function barChartContextCallback(timeStart, timeEnd) {
   // console.log("start:", timeStart, "end:", timeEnd);
   lineChart.changeTime(timeStart, timeEnd, true);
+  longBarChart.setTimeRange(timeStart, timeEnd);
 }
 
 function changeBarChartValueType(indexOfSelector) {
@@ -202,5 +184,17 @@ function changeBarChartFacilityFilter(indexOfSelector) {
         barChartContextObj.aggregationFilter
       );
     };
+  }
+}
+
+function aggregatorFactory(valueType) {
+  if (valueType == "mean") {
+    return new MeanAggregator();
+  }
+  if (valueType == "std") {
+    return new StdAggregator();
+  }
+  if (valueType == "count") {
+    return new CountAggregator();
   }
 }
