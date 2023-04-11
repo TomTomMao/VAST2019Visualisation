@@ -95,6 +95,7 @@ class BarChart {
   }
   _updateTitle() {}
   _renderChart() {
+    console.log("rendering chart");
     let thisObj = this;
     thisObj.chart
       .selectAll(".bar")
@@ -349,10 +350,147 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     this.timeAttrName = timeAttrName;
     this.valueAttrName = valueAttrName;
     this.dataToDisplay = this._getDataToDisplay();
+
+    this.yAttrName = "group";
+    this.xAttrName1 = "mainValue";
+    this.xAttrName2 = "secondValue";
   }
-  initVis() {}
-  updateVis() {}
-  renderVis() {}
+  _initScales() {
+    let thisObj = this;
+    thisObj.xScale1 = d3.scaleLinear().range([0, thisObj.width]); // scale1 is for main value (top)
+    thisObj.xScale2 = d3.scaleLinear().range([0, thisObj.width]); // scale2 is for secondary value (bottom)
+    thisObj.yScale = d3.scaleBand().range([0, thisObj.height]); // scale for group
+  }
+
+  _initAxes() {
+    let thisObj = this;
+    thisObj.xAxis1 = d3
+      .axisTop(thisObj.xScale1)
+      .ticks(10)
+      .tickSizeOuter(0)
+      .tickPadding(10);
+    thisObj.xAxis2 = d3
+      .axisBottom(thisObj.xScale2)
+      .ticks(10)
+      .tickSizeOuter(0)
+      .tickPadding(10);
+    thisObj.yAxis = d3
+      .axisLeft(thisObj.yScale)
+      .ticks(5)
+      .tickSizeOuter(0)
+      .tickPadding(10);
+    thisObj.XAxisG1 = thisObj.chart
+      .append("g")
+      .attr("class", "axis x-axis")
+      .attr("transform", `translate(0, 0)`);
+    thisObj.XAxisG2 = thisObj.chart
+      .append("g")
+      .attr("class", "axis x-axis")
+      .attr("transform", `translate(0, ${thisObj.height})`);
+    thisObj.YAxisG = thisObj.chart.append("g").attr("class", "axis y-axis");
+  }
+
+  _updateGetter() {
+    let thisObj = this;
+    thisObj.getX = (d) => d[thisObj.xAttrName1];
+    thisObj.getX2 = (d) => d[thisObj.xAttrName2];
+    thisObj.getY = (d) => d[thisObj.yAttrName];
+  }
+
+  _updateScales() {
+    let thisObj = this;
+    thisObj.xScale1.domain([
+      0,
+      d3.max(thisObj.dataToDisplay, (d) => d[thisObj.xAttrName1]),
+    ]);
+    thisObj.xScale2.domain([
+      0,
+      d3.max(thisObj.dataToDisplay, (d) => d[thisObj.xAttrName2]),
+    ]);
+    thisObj.yScale.domain(
+      thisObj.dataToDisplay.map((d) => d[thisObj.yAttrName])
+    );
+  }
+
+  _renderChart() {
+    let thisObj = this;
+    let dataToDisplayLong = [];
+    thisObj.dataToDisplay.forEach((d) => {
+      dataToDisplayLong.push({
+        group: d[thisObj.yAttrName],
+        mainValue: d[thisObj.xAttrName1],
+        secondValue: 0,
+        type: "main",
+      });
+      dataToDisplayLong.push({
+        group: d[thisObj.yAttrName],
+        mainValue: 0,
+        secondValue: d[thisObj.xAttrName2],
+        type: "second",
+      });
+    });
+
+    thisObj.chart
+      .selectAll(".bar")
+      .data(dataToDisplayLong, (d) => d.group)
+      .join("rect")
+      .attr("class", "bar")
+      .attr("x", 0)
+      .attr("y", (d) => {
+        if (d.type === "main") {
+          return thisObj.yScale(thisObj.getY(d));
+        } else {
+          return thisObj.yScale(thisObj.getY(d)) + thisObj.yScale.bandwidth() / 4;
+        }
+      })
+      .attr("width", (d) => {
+        if (d.type === "main") {
+          return thisObj.xScale1(thisObj.getX(d));
+        } else {
+          return thisObj.xScale2(thisObj.getX2(d));
+        }
+      })
+      .attr("height", (d) => {
+        if (d.type === "main") {
+          return thisObj.yScale.bandwidth();
+        } else {
+          return thisObj.yScale.bandwidth() / 2;
+        }
+      })
+      .attr("fill", (d) => {
+        if (d.type === "main") {
+          return "steelblue";
+        } else {
+          return "orange";
+        }
+      });
+  }
+  _renderAxes() {
+    let thisObj = this;
+    // change axis format depends on the value lengh
+    thisObj.xAxis1.tickFormat((d) => {
+      if (d >= 1000000) {
+        return d / 1000000 + "M";
+      } else if (d >= 1000) {
+        return d / 1000 + "K";
+      } else {
+        return d;
+      }
+    });// genereated by github copilot
+    thisObj.xAxis2.tickFormat((d) => {
+      if (d >= 1000000) {
+        return d / 1000000 + "M";
+      } else if (d >= 1000) {
+        return d / 1000 + "K";
+      } else {
+        return d;
+      }
+    });// genereated by github copilot
+    thisObj.XAxisG1.call(thisObj.xAxis1);
+    thisObj.XAxisG2.call(thisObj.xAxis2);
+    thisObj.YAxisG.call(thisObj.yAxis);
+  }
+
   setGroupAttribute(attr, update = true) {
     // attr: string in LONG_BAR_CHART_GROUP_ATTRS
     // validation
@@ -365,6 +503,7 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     if (update) {
       thisObj.dataToDisplay = thisObj._getDataToDisplay();
       thisObj.updateVis();
+      thisObj.renderVis();
     }
   }
   setMainValueType(aggregator, update = true) {
@@ -382,10 +521,11 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     }
     let thisObj = this;
     thisObj.encoding.mainValueType = aggregator;
-    
+
     if (update) {
       thisObj.dataToDisplay = thisObj._getDataToDisplay();
       thisObj.updateVis();
+      thisObj.renderVis();
     }
   }
   setSecondValueType(aggregator, update = true) {
@@ -406,6 +546,7 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     if (update) {
       thisObj.dataToDisplay = thisObj._getDataToDisplay();
       thisObj.updateVis();
+      thisObj.renderVis();
     }
   }
   setTimeRange(startTime, endTime, update = true) {
@@ -417,7 +558,10 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     thisObj.startTime = startTime;
     thisObj.endTime = endTime;
     thisObj.dataToDisplay = thisObj._getDataToDisplay();
-    update && thisObj.updateVis();
+    if (update) {
+      thisObj.updateVis();
+      thisObj.renderVis();
+    }
   }
   getGroupAttribute() {
     // return string in LONG_BAR_CHART_GROUP_ATTRS
@@ -471,7 +615,70 @@ class CompositeVerticalAggregatedBarChart extends BarChart {
     }
     return dataToDisplay;
   }
-  sortByGroup() {}
-  sortByMain() {}
-  sortBySecond() {}
+  sortByGroup(descending = false, update = true) {
+    // sort the data by group
+    // descending: boolean
+    // update: boolean
+    // if update is true, update the vis
+    let thisObj = this;
+    thisObj.dataToDisplay.sort((a, b) => {
+      if (descending) {
+        if (thisObj.getGroupAttribute() === "location"){
+          return Number(b.group) - Number(a.group);
+        } else {
+          return b > a;
+        }
+      } else {
+        if (thisObj.getGroupAttribute() === "location"){
+          return Number(a.group) - Number(b.group);
+        } else {
+          return a > b;
+        }
+      }
+    }
+    );
+    if (update===true) {
+      thisObj.updateVis();
+      thisObj.renderVis();
+    }
+
+  }
+  sortByMain(descending = false, update = true) {
+    // sort the data by main value
+    // descending: boolean
+    // update: boolean
+    // if update is true, update the vis
+    let thisObj = this;
+    thisObj.dataToDisplay.sort((a, b) => {
+      if (descending) {
+        return b.mainValue - a.mainValue;
+      } else {
+        return a.mainValue - b.mainValue;
+      }
+    }
+    );
+    if (update===true) {
+      thisObj.updateVis();
+      thisObj.renderVis();
+    }
+  }
+  sortBySecond(descending = false, update = true) {
+    // sort the data by second value
+    // descending: boolean
+    // update: boolean
+    // if update is true, update the vis
+    let thisObj = this;
+    thisObj.dataToDisplay.sort((a, b) => {
+      if (descending) {
+        return b.secondValue - a.secondValue;
+      } else {
+        return a.secondValue - b.secondValue;
+      }
+    }
+    );
+    if (update===true) {
+      thisObj.updateVis();
+      thisObj.renderVis();
+    }
+  }
 }

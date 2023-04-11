@@ -70,15 +70,15 @@ async function main() {
   barChartContext.renderVis();
 
   let longBarChartConfig = (_config = {
-    parentElementId: "#longBarChartSvg",
+    parentElementId: "#longBarChartLongSvg",
     containerWidth: 400,
     containerHeight: 1000,
-    margin: { top: 20, right: 20, bottom: 30, left: 40 },
+    margin: { top: 40, right: 20, bottom: 30, left: 40 },
   });
   let longBarChartEncoding = {
     group: "location",
     mainValueType: new MeanAggregator(),
-    secondValueType: new CountAggregator(),
+    secondValueType: new StdAggregator(),
   };
   longBarChart = new CompositeVerticalAggregatedBarChart(
     longBarChartConfig,
@@ -88,6 +88,9 @@ async function main() {
     "damage_value"
   );
   longBarChart.initVis();
+  longBarChart.updateVis();
+  longBarChart.renderVis();
+  
 }
 
 main();
@@ -111,6 +114,7 @@ function testToolTip() {
 function barChartContextCallback(timeStart, timeEnd) {
   // console.log("start:", timeStart, "end:", timeEnd);
   lineChart.changeTime(timeStart, timeEnd, true);
+  longBarChart.setTimeRange(timeStart, timeEnd);
 }
 
 function changeBarChartValueType(indexOfSelector) {
@@ -180,5 +184,17 @@ function changeBarChartFacilityFilter(indexOfSelector) {
         barChartContextObj.aggregationFilter
       );
     };
+  }
+}
+
+function aggregatorFactory(valueType) {
+  if (valueType == "mean") {
+    return new MeanAggregator();
+  }
+  if (valueType == "std") {
+    return new StdAggregator();
+  }
+  if (valueType == "count") {
+    return new CountAggregator();
   }
 }
