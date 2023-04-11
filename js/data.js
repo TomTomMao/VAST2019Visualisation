@@ -209,10 +209,11 @@ class TimeSeriesData {
     return aggregatedData;
   }
   getGroupedData(aggregator, startTime, endTime, groupBy = "location") {
-    // return {timeStart: time, timeEnd: time, aggregatorType: aggregator.aggregatorType, groupedData: [{x: groupBy, y: aggregatedValue}, {x: groupBy, y: aggregatedValue}, ...]}
+    // return {timeStart: time, timeEnd: time, aggregatorType: aggregator.aggregatorType, groupByAtrribute: groupBy,groupedData: a map from location to aggregated value}
     // startTime and endTime should be Date objects, startTime should be smaller than endTime;
     // aggregator is an object of Aggregator class (mean or count)
     // groupBy is a string, the name of the attribute that the data is grouped by; they would apply on the data[valueAttrName]]
+    // reference: https://observablehq.com/@d3/d3-group
 
     let thisObj = this;
     if (thisObj.sortedDataByTime === undefined) {
@@ -220,67 +221,34 @@ class TimeSeriesData {
         (a, b) => a[thisObj.timeAttrName] - b[thisObj.timeAttrName]
       );
     }
-    let groupedDataCache = {};
-    // find the first and last data point that is within the time range
-    let firstDataPointIndex = thisObj.sortedDataByTime.findIndex(
-      (d) => d[thisObj.timeAttrName] >= startTime
-    ); // left closed
-    let lastDataPointIndex = thisObj.sortedDataByTime.findIndex(
-      (d) => d[thisObj.timeAttrName] > endTime
-    ); // right open
     if (aggregator.aggregatorType === "mean") {
-        for (let i = firstDataPointIndex; i < lastDataPointIndex; i++) {
-            let dataPoint = thisObj.sortedDataByTime[i];
-            let groupByValue = dataPoint[groupBy];
-            let value = dataPoint[thisObj.valueAttrName];
-            if (groupedDataCache.hasOwnProperty(groupByValue)) {
-                groupedDataCache[groupByValue].sum += value;
-                groupedDataCache[groupByValue].count += 1;
-            } else {
-                groupedDataCache[groupByValue] = {sum: value, count: 1};
-            }
-        }
-        let groupedData = [];
-        console.log(groupedDataCache)
-        for (let groupByValue in groupedDataCache) {
-            groupedData.push({
-                x: groupByValue,
-                y: groupedDataCache[groupByValue].sum / groupedDataCache[groupByValue].count,
-            })
-        }
-        return {
-            timeStart: startTime,
-            timeEnd: endTime,
-            aggregatorType: aggregator.aggregatorType,
-            groupedData: groupedData,
-        }
+      var groupedData = d3.rollup(
+        thisObj.sortedDataByTime,
+        (v) => d3.mean(v, (d) => d.damage_value),
+        (d) => d[groupBy]
+      );
+    } else if (aggregator.aggregatorType === "std") {
+      var groupedData = d3.rollup(
+        thisObj.sortedDataByTime,
+        (v) => d3.deviation(v, (d) => d.damage_value),
+        (d) => d[groupBy]
+      );
     } else if (aggregator.aggregatorType === "count") {
-        for (let i = firstDataPointIndex; i < lastDataPointIndex; i++) {
-            let dataPoint = thisObj.sortedDataByTime[i];
-            let groupByValue = dataPoint[groupBy];
-            let value = dataPoint[thisObj.valueAttrName];
-            if (groupedDataCache.hasOwnProperty(groupByValue)) {
-                groupedDataCache[groupByValue].count += 1;
-            } else {
-                groupedDataCache[groupByValue] = {count: 1};
-            }
-        }
-        let groupedData = [];
-        for (let groupByValue in groupedDataCache) {
-            groupedData.push({
-                x: groupByValue,
-                y: groupedDataCache[groupByValue].count,
-            })
-        }
-        return {
-            timeStart: startTime,
-            timeEnd: endTime,
-            aggregatorType: aggregator.aggregatorType,
-            groupedData: groupedData,
-        }
+      var groupedData = d3.rollup(
+        thisObj.sortedDataByTime,
+        (v) => v.length,
+        (d) => d[groupBy]
+      );
     } else {
-        throw new Error("aggregator type not supported");
+      throw "aggregator type not supported";
     }
+    return {
+      timeStart: startTime,
+      timeEnd: endTime,
+      aggregatorType: aggregator.aggregatorType,
+      groupByAtrribute: groupBy,
+      groupedData: groupedData
+    };
   }
 }
 // mean and count is tested. the others are not tested
@@ -346,7 +314,7 @@ class CountAggregator extends Aggregator {
   }
 }
 
-class stdAggregator extends Aggregator {
+class StdAggregator extends Aggregator {
   constructor() {
     super();
     this.aggregatorType = "std";
