@@ -4,12 +4,19 @@ body {
 
 
 /* chart column */
+.chartsColumns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 600px;
+}
+
 .chartsColumn {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 600px;
-  
+  border: black 1px solid;
 }
 
 

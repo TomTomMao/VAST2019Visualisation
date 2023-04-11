@@ -107,10 +107,10 @@ class BarChart {
       .attr("height", (d) => {
         let height = thisObj.height - thisObj.yScale(thisObj.getY(d));
         if (typeof height === "number") {
-          console.log("height is a number: ", height)
+          // console.log("height is a number: ", height);
           return height;
         } else {
-          console.log("height is not a number: ", height)
+          // console.log("height is not a number: ", height);
           return 0;
         }
       });
@@ -151,7 +151,7 @@ class BrushableTimeIntervalBarChart extends BarChart {
     // facilities: 'all' or a subset of VALID_FACILITIES, an array of strings of facility names
     // aggregation: 'mean' or 'count'
     // validation for location, facility and aggregation
-    console.log(locations)
+    console.log(locations);
     if (
       locations == "all" ||
       locations.every((l) => VALID_LOCATION.includes(l))
@@ -281,7 +281,10 @@ class BrushableTimeIntervalBarChart extends BarChart {
     thisObj.brushG = thisObj.svg
       .append("g")
       .attr("class", "brush x-brush")
-      .attr("transform", `translate(${thisObj.margin.left}, ${thisObj.margin.top})`)
+      .attr(
+        "transform",
+        `translate(${thisObj.margin.left}, ${thisObj.margin.top})`
+      )
       .call(thisObj.brush);
   }
   changeFilter(locations, facilities, aggregation) {
@@ -318,4 +321,157 @@ class BrushableTimeIntervalBarChart extends BarChart {
     thisObj.updateVis();
     thisObj.renderVis();
   }
+}
+class CompositeVerticalAggregatedBarChart extends BarChart {
+  constructor(
+    _config,
+    _data,
+    encoding,
+    timeAttrName,
+    valueAttrName,
+    startTime = null,
+    endTime = null
+  ) {
+    // encoding {group: string, mainValueType: Aggregator, secondValueType: Aggregator}
+    super(_config, _data);
+    console.log(encoding);
+    this.encoding = {
+      group: "",
+      mainValueType: new Aggregator(),
+      secondValueType: new Aggregator(),
+    };
+    this.setGroupAttribute(encoding.group, false);
+    this.setMainValueType(encoding.mainValueType, false);
+    this.setSecondValueType(encoding.secondValueType, false);
+
+    this.startTime = startTime ? startTime : d3.min(_data, (d) => d.time);
+    this.endTime = endTime ? endTime : d3.max(_data, (d) => d.time);
+    this.timeAttrName = timeAttrName;
+    this.valueAttrName = valueAttrName;
+    this.dataToDisplay = this._getDataToDisplay();
+  }
+  initVis() {}
+  updateVis() {}
+  renderVis() {}
+  setGroupAttribute(attr, update = true) {
+    // attr: string in LONG_BAR_CHART_GROUP_ATTRS
+    // validation
+    if (!LONG_BAR_CHART_GROUP_ATTRS.includes(attr)) {
+      console.error("Invalid group attribute");
+      return;
+    }
+    let thisObj = this;
+    thisObj.encoding.group = attr;
+    if (update) {
+      thisObj.dataToDisplay = thisObj._getDataToDisplay();
+      thisObj.updateVis();
+    }
+  }
+  setMainValueType(aggregator, update = true) {
+    // aggregator: aggregator object whose type in LONG_BAR_CHART_AGGREGATORS
+    // validation
+    if (!LONG_BAR_CHART_AGGREGATORS.includes(aggregator.aggregatorType)) {
+      console.error(
+        "Invalid aggregator type. Allowed types: " +
+          LONG_BAR_CHART_AGGREGATORS.join(", ") +
+          ". " +
+          aggregator.aggregatorType +
+          " is not allowed."
+      );
+      return;
+    }
+    let thisObj = this;
+    thisObj.encoding.mainValueType = aggregator;
+    
+    if (update) {
+      thisObj.dataToDisplay = thisObj._getDataToDisplay();
+      thisObj.updateVis();
+    }
+  }
+  setSecondValueType(aggregator, update = true) {
+    // aggregator: aggregator object whose type in LONG_BAR_CHART_AGGREGATORS
+    // validation
+    if (!LONG_BAR_CHART_AGGREGATORS.includes(aggregator.aggregatorType)) {
+      console.error(
+        "Invalid aggregator type. Allowed types: " +
+          LONG_BAR_CHART_AGGREGATORS.join(", ") +
+          ". " +
+          aggregator.aggregatorType +
+          " is not allowed."
+      );
+      return;
+    }
+    let thisObj = this;
+    thisObj.encoding.secondValueType = aggregator;
+    if (update) {
+      thisObj.dataToDisplay = thisObj._getDataToDisplay();
+      thisObj.updateVis();
+    }
+  }
+  setTimeRange(startTime, endTime, update = true) {
+    // startTime: Date object
+    // endTime: Date object
+    // startTime should be smaller than endTime
+    // set the startTime and endTime of the chart
+    let thisObj = this;
+    thisObj.startTime = startTime;
+    thisObj.endTime = endTime;
+    thisObj.dataToDisplay = thisObj._getDataToDisplay();
+    update && thisObj.updateVis();
+  }
+  getGroupAttribute() {
+    // return string in LONG_BAR_CHART_GROUP_ATTRS
+    return this.encoding.group;
+  }
+  getMainValueType() {
+    // return Aggregator object
+    return this.encoding.mainValueType;
+  }
+  getSecondValueType() {
+    // return Aggregator object
+    return this.encoding.secondValueType;
+  }
+  _getDataToDisplay() {
+    // return [{group: "group1", mainValue: 1, secondValue: 2}, {group: "group2", mainValue: 3, secondValue: 4}...]
+    // return value depends on the this.encoding
+    let thisObj = this;
+    let timeSeriesData = new TimeSeriesData(
+      thisObj.data,
+      thisObj.timeAttrName,
+      thisObj.valueAttrName
+    );
+    let mainData = timeSeriesData.getGroupedData(
+      thisObj.encoding.mainValueType,
+      thisObj.startTime,
+      thisObj.endTime,
+      thisObj.encoding.group
+    );
+    let secondData = timeSeriesData.getGroupedData(
+      thisObj.encoding.secondValueType,
+      thisObj.startTime,
+      thisObj.endTime,
+      thisObj.encoding.group
+    );
+    let mainGroupedData = mainData.groupedData; // a map object
+    let secondGroupedData = secondData.groupedData; // a map object
+    console.log(mainGroupedData);
+    console.log(secondGroupedData);
+    let groupNames = Array.from(mainGroupedData.keys());
+    // {timeStart: time, timeEnd: time, aggregatorType: aggregator.aggregatorType, groupByAtrribute: groupBy,groupedData: a map from location to aggregated value}
+    // console.log(groupsName)
+    let dataToDisplay = [];
+    for (let groupName of groupNames) {
+      let mainValue = mainGroupedData.get(groupName);
+      let secondValue = secondGroupedData.get(groupName);
+      dataToDisplay.push({
+        group: groupName,
+        mainValue: mainValue,
+        secondValue: secondValue,
+      });
+    }
+    return dataToDisplay;
+  }
+  sortByGroup() {}
+  sortByMain() {}
+  sortBySecond() {}
 }

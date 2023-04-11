@@ -213,35 +213,55 @@ class TimeSeriesData {
     // startTime and endTime should be Date objects, startTime should be smaller than endTime;
     // aggregator is an object of Aggregator class (mean or count)
     // groupBy is a string, the name of the attribute that the data is grouped by; they would apply on the data[valueAttrName]]
+    // All the group would be in groupedData, if a gorup does not have any data point, the aggregated value would be null
+    // the aggregated value would be the aggregated value of the data points that are in the time interval [startTime, endTime)
     // reference: https://observablehq.com/@d3/d3-group
 
     let thisObj = this;
+    if (groupBy == "location") {
+      var GROUPKEYS = VALID_LOCATION;
+    } else if (groupBy == "facility") {
+      var GROUPKEYS = VALID_FACILITIES;
+    }
     if (thisObj.sortedDataByTime === undefined) {
       thisObj.sortedDataByTime = thisObj.data.sort(
         (a, b) => a[thisObj.timeAttrName] - b[thisObj.timeAttrName]
       );
     }
+    let startTimePoint = thisObj.sortedDataByTime.findIndex(
+      (d) => d[thisObj.timeAttrName] >= startTime
+    );
+    let endTimePoint = thisObj.sortedDataByTime.findIndex(
+      (d) => d[thisObj.timeAttrName] >= endTime
+    );
     if (aggregator.aggregatorType === "mean") {
       var groupedData = d3.rollup(
-        thisObj.sortedDataByTime,
+        thisObj.sortedDataByTime.slice(startTimePoint, endTimePoint),
         (v) => d3.mean(v, (d) => d.damage_value),
         (d) => d[groupBy]
       );
     } else if (aggregator.aggregatorType === "std") {
       var groupedData = d3.rollup(
-        thisObj.sortedDataByTime,
+        thisObj.sortedDataByTime.slice(startTimePoint, endTimePoint),
         (v) => d3.deviation(v, (d) => d.damage_value),
         (d) => d[groupBy]
       );
     } else if (aggregator.aggregatorType === "count") {
       var groupedData = d3.rollup(
-        thisObj.sortedDataByTime,
+        thisObj.sortedDataByTime.slice(startTimePoint, endTimePoint),
         (v) => v.length,
         (d) => d[groupBy]
       );
     } else {
       throw "aggregator type not supported";
     }
+    // add null to the group that does not have any data point
+    for (let i = 0; i < GROUPKEYS.length; i++) {
+      if (groupedData.get(GROUPKEYS[i]) === undefined) {
+        groupedData.set(GROUPKEYS[i], null);
+      }
+    }
+
     return {
       timeStart: startTime,
       timeEnd: endTime,
