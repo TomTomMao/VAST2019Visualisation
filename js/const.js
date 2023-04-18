@@ -46,3 +46,9 @@ const VALID_FACILITIES = [
 ];
 const LONG_BAR_CHART_GROUP_ATTRS = ['location', 'facility']
 const LONG_BAR_CHART_AGGREGATORS = ['mean', 'std', 'count']
+
+const STACKED_AREA_COLOURS = ["red",
+"green",
+"blue",
+"yellow",
+"orange",]

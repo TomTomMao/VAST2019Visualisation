@@ -84,3 +84,10 @@ body {
   display: flex;
   flex-direction: row;
 }
+
+/* stack area chart */
+
+#stackedAreaChart {
+  display: flex;
+  flex-direction: row;
+}

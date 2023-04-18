@@ -3,6 +3,9 @@ let stactAreaChart;
 let barChartContext;
 let longBarChart;
 let data;
+let meanData;
+let aggregatedData;
+let groupedAggregatedData;
 const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
 const parseTimeReverse = function (time) {
   return (
@@ -21,6 +24,7 @@ const parseTimeReverse = function (time) {
 async function main() {
   data = await d3.csv("../data/data_long.csv");
   meanData = await d3.csv("../data/data_mean.csv");
+  aggregatedData = await d3.csv("../data/data_long_aggregated_avg_time_facitily_location.csv")
   // convert data to numbers, convert timestring to date object
   data.forEach((d) => {
     d.damage_value = +d.damage_value;
@@ -30,7 +34,24 @@ async function main() {
     d.damage_value = +d.damage_value;
     d.time = parseTime(d.time);
   });
+  aggregatedData.forEach((d) => {
+    d.mean_damage_value = +d.mean_damage_value;
+    d.time = parseTime(d.time);
+  });
+  
   meanData.sort((a, b) => a.time - b.time);
+
+  stackedAreaChart = new StackedAreaChart(
+    {
+      parentElementId: "#stackedAreaChartSvg",
+      legends:"#stackedAreaChartLegend",
+      title: "#stackedAreaChartTitle",
+      containerWidth: 1000,
+      containerHeight: 200,
+      margin: {top: 20, right: 20, bottom: 30, left: 40}
+    }
+    ,_data=aggregatedData
+  )
 
   lineChart = new LineChart(
     (parentElementId = "#lineChartSvg"),
@@ -72,7 +93,7 @@ async function main() {
   let longBarChartConfig = (_config = {
     parentElementId: "#longBarChartLongSvg",
     containerWidth: 400,
-    containerHeight: 1000,
+    containerHeight: 700,
     margin: { top: 40, right: 20, bottom: 30, left: 40 },
   });
   let longBarChartEncoding = {
@@ -115,6 +136,7 @@ function barChartContextCallback(timeStart, timeEnd) {
   // console.log("start:", timeStart, "end:", timeEnd);
   lineChart.changeTime(timeStart, timeEnd, true);
   longBarChart.setTimeRange(timeStart, timeEnd);
+  stackedAreaChart.setTimeRange(timeStart, timeEnd);
 }
 
 function changeBarChartValueType(indexOfSelector) {
@@ -198,3 +220,4 @@ function aggregatorFactory(valueType) {
     return new CountAggregator();
   }
 }
+
