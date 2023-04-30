@@ -1,5 +1,6 @@
 class BaseChart {
-    constructor(config, data, time) {
+    //REFERENCE: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/2_d3_tutorial
+    constructor(config) {
         this.config = {
             parentElementId: config.parentElementId,
             containerWidth: config.containerWidth,
@@ -12,17 +13,13 @@ class BaseChart {
             }
         }
         this.data = data;
-        this.time = {
-            startTime: time.startTime,
-            endTime: time.endTime
-        }
     }
     initVis() {
         let thisObj = this;
 
         // init width for the drawing area
-        thisObj.width = thisObj.config.containerWidth - thisObj.margin.left - thisObj.margin.right;
-        thisObj.height = thisObj.config.containerHeight - thisObj.margin.top - thisObj.margin.bottom;
+        thisObj.width = thisObj.config.containerWidth - thisObj.config.margin.left - thisObj.config.margin.right;
+        thisObj.height = thisObj.config.containerHeight - thisObj.config.margin.top - thisObj.config.margin.bottom;
 
         // select the svg, setting width and height
         thisObj.svg = d3.select(thisObj.config.parentElementId).attr("width", thisObj.containerWidth).attr("height", thisObj.containerHeight);
@@ -30,21 +27,46 @@ class BaseChart {
         // drawing area
         thisObj.chart = thisObj.svg.append("g").attr("transform", `translate(${thisObj.config.margin.left}, ${thisObj.config.margin.top})`);
     }
+    updateVis() {
+    }
+
+    renderVis() {
+    }
 }
 
 class TwoAxisTimeChart extends BaseChart {
     // x at bottom - scaleTime
     // y at left - scaleLinear
+    constructor(config, data, time) {
+        super(config, data);
+        this.time = {
+            startTime: time.startTime,
+            endTime: time.endTime
+        }
+    }
     initVis() {
         let thisObj = this;
-        super().initVis()
+        super.initVis()
 
         // x scale
         thisObj.xScale = d3.scaleTime().range([0, thisObj.width]);
         // x axis bottom
         thisObj.xAxis = d3
-        .axisBottm(xScale)
+        .axisBottom(thisObj.xScale)
+        // x group
+        thisObj.xAxisG = thisObj.chart.append("g").attr("class", "axis x-axis").attr("transform", `translate(0,${thisObj.height})`);
 
-        thisObj.yScale = d3.scaleTime().range([thisObj.height, 0]);
+        // y scale
+        thisObj.yScale = d3.scaleLinear().range([thisObj.height, 0]);
+        // y axis left
+        thisObj.yAxis = d3
+        .axisLeft(thisObj.yScale)
+        // y group
+        thisObj.yAxisG = thisObj.chart.append("g").attr("class", "axis y-axis");
+    }
+    renderVis() {
+        let thisObj = this;
+        thisObj.xAxisG.call(thisObj.xAxis);
+        thisObj.yAxisG.call(thisObj.yAxis);
     }
 }

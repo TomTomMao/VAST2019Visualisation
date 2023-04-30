@@ -13,7 +13,7 @@
     
 }
 
-#line-chart-container,
+
 #line-chart-legends {
     height: 400px;
 }
@@ -24,7 +24,7 @@
 
 
 
-#line-chart-container,
+
 #bar-chart-1-container,
 #area-chart-container {
     width: 1200px;

@@ -2,6 +2,12 @@ let data_long;
 let parseTime = d3.timeParse("%Y/%m/%d %H:%M");
 let t1;
 let t2;
+let tMin;
+let tMax;
+let lineChart;
+let barChart1;
+let barChart2
+let areaChart;
 async function main() {
     console.log("[test main.js]helo")
     data_long = await d3.csv("data/data_long.csv")
@@ -19,11 +25,27 @@ async function main() {
     data_long = data_long.sort((a, b) => {
         return a.time - b.time;
     })
+
     // for testing in console
     t1 = data_long[30000].time;
     t2 = data_long[40000].time;
+    tMin = data_long[0].time;
+    tMax = data_long[data_long.length - 1].time
+    // some assertion
+    if (DEVMODE && tMin - d3.min(data_long, d=>d.time) != 0){
+        throw new Error("data_long[0].time != d3.min(data_long, d=>d.time), sorted data is not correct")
+    }
+    if (DEVMODE && tMax - d3.max(data_long, d=>d.time) != 0){
+        throw new Error("data_long[data_long.length - 1].time != d3.max(data_long, d=>d.time), sorted data is not correct")
+    }
 
-    
+    lineChart = new LineChart(config=LINECHART_CONFIG, data=getLineChartData(data_long, tMin, tMax, ["all","1"]), {startTime:tMin, endTime:tMax})
+
+}
+function changeLineChart(startTime, endTime, chart=lineChart, locations) {
+    chart.setTime({startTime: startTime, endTime: endTime});
+    chart.data = getLineChartData(data_long, startTime, endTime, locations)
+    chart.updateVis();
 
 }
 function getLineChartData(sortedLongData, startTime, endTime, locations) {
@@ -52,7 +74,7 @@ function getLineChartData(sortedLongData, startTime, endTime, locations) {
             return Array.from(d[1])
                 .map((e) => { return { location: d[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
         }).flat()
-    console.log(locationMeanData)
+    // console.log(locationMeanData)
     // locationMeanData: [{location:String(int), time: timeObj, meanDamageValue: int}]
 
     return [totalMeanData,locationMeanData].flat().filter((d)=>locations.includes(d.location))
