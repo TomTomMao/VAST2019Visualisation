@@ -1,6 +1,6 @@
 class BaseChart {
     //REFERENCE: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/2_d3_tutorial
-    constructor(config) {
+    constructor(config, data) {
         this.config = {
             parentElementId: config.parentElementId,
             containerWidth: config.containerWidth,

@@ -40,7 +40,7 @@ async function main() {
     }
 
     lineChart = new LineChart(config = LINECHART_CONFIG, data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
-    areaChart = new AreaChart(config = AREACHART_CONFIG, data = getAreaChartData(data_long, tMin, tMax, "1"), {startTime: tMin, endTime: tMax})
+    areaChart = new AreaChart(config = AREACHART_CONFIG, data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
 }
 
 // LINE chart functions
@@ -84,7 +84,7 @@ function getLineChartData(sortedLongData, startTime, endTime, locations) {
 
 // AREA chart functions
 function changeAreaChart(startTime, endTime, location, chart = areaChart) {
-    chart.setTime({startTime:startTime, endTime: endTime});
+    chart.setTime({ startTime: startTime, endTime: endTime });
     chart.data = getAreaChartData(data_long, startTime, endTime, location);
     chart.updateVis()
 }
@@ -108,9 +108,25 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
     if (locationData == undefined) {
         return []
     } else {
-        let longData = Array.from(locationData).map(d => { return Array.from(d[1]).map(e => { return { location: location, facility: d[0],timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } }) }).flat()
+        let longData = Array.from(locationData).
+            map(d => {
+                return Array.from(d[1])
+                    .map(e => { return { location: location, facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
+            }).flat()
         return longData;
     }
+}
+
+function getBarChart2Data(sortedLongData, startTime, endTime) {
+    let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime);
+
+    let rolledDataMean = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location)
+    let flatMean = Array.from(rolledDataMean).map(d=>{return {location: d[0], meanDamageValue: d[1]}})
+    let rolledDataCount = d3.rollup(filteredData, v => d3.count(v, d => d.damageValue), d => d.location)
+    let flatCount = Array.from(rolledDataCount).map(d=>{return {location: d[0], count: d[1]}})
+    let rolledDataStd = d3.rollup(filteredData, v => d3.deviation(v, d => d.damageValue), d => d.location)
+    let flatStd = Array.from(rolledDataStd).map(d=>{return {location: d[0], std: d[1]}})
+    return {mean: flatMean, count: flatCount, std: flatStd}
 }
 
 // helpers
