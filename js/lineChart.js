@@ -49,9 +49,5 @@ class LineChart extends TwoAxisTimeChart {
         let thisObj = this;
         return Array.from(new Set(thisObj.data.map(d=>d.location)))
     }
-    setTime(time) {
-        let thisObj = this;
-        thisObj.time.startTime = time.startTime
-        thisObj.time.endTime = time.endTime
-    }
+
 }

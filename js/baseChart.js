@@ -52,7 +52,7 @@ class TwoAxisTimeChart extends BaseChart {
         thisObj.xScale = d3.scaleTime().range([0, thisObj.width]);
         // x axis bottom
         thisObj.xAxis = d3
-        .axisBottom(thisObj.xScale)
+        .axisBottom(thisObj.xScale).tickFormat(d3.timeFormat("%m-%d %H:%M"))
         // x group
         thisObj.xAxisG = thisObj.chart.append("g").attr("class", "axis x-axis").attr("transform", `translate(0,${thisObj.height})`);
 
@@ -68,5 +68,10 @@ class TwoAxisTimeChart extends BaseChart {
         let thisObj = this;
         thisObj.xAxisG.call(thisObj.xAxis);
         thisObj.yAxisG.call(thisObj.yAxis);
+    }
+    setTime(time) {
+        let thisObj = this;
+        thisObj.time.startTime = time.startTime
+        thisObj.time.endTime = time.endTime
     }
 }

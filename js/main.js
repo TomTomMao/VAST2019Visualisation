@@ -32,18 +32,20 @@ async function main() {
     tMin = data_long[0].time;
     tMax = data_long[data_long.length - 1].time
     // some assertion
-    if (DEVMODE && tMin - d3.min(data_long, d=>d.time) != 0){
+    if (DEVMODE && tMin - d3.min(data_long, d => d.time) != 0) {
         throw new Error("data_long[0].time != d3.min(data_long, d=>d.time), sorted data is not correct")
     }
-    if (DEVMODE && tMax - d3.max(data_long, d=>d.time) != 0){
+    if (DEVMODE && tMax - d3.max(data_long, d => d.time) != 0) {
         throw new Error("data_long[data_long.length - 1].time != d3.max(data_long, d=>d.time), sorted data is not correct")
     }
 
-    lineChart = new LineChart(config=LINECHART_CONFIG, data=getLineChartData(data_long, tMin, tMax, ["all","1"]), {startTime:tMin, endTime:tMax})
-
+    lineChart = new LineChart(config = LINECHART_CONFIG, data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
+    areaChart = new AreaChart(config = AREACHART_CONFIG, data = getAreaChartData(data_long, tMin, tMax, "1"), {startTime: tMin, endTime: tMax})
 }
-function changeLineChart(startTime, endTime, chart=lineChart, locations) {
-    chart.setTime({startTime: startTime, endTime: endTime});
+
+// LINE chart functions
+function changeLineChart(startTime, endTime, locations, chart = lineChart) {
+    chart.setTime({ startTime: startTime, endTime: endTime });
     chart.data = getLineChartData(data_long, startTime, endTime, locations)
     chart.updateVis();
 
@@ -59,10 +61,10 @@ function getLineChartData(sortedLongData, startTime, endTime, locations) {
      * @param {object} endTime Long data include location, time, damageValue, facility; Assume already sorted by time
      * @param {object} locations Long data include location, time, damageValue, facility; Assume already sorted by time 
     */
-    if (sortedLongData.length == 0) {
+    if (DEVMODE && sortedLongData.length == 0) {
         throw new Error("sortedLongData.length must be >= 1")
     }
-    if (isSortedByTime(sortedLongData) == false) {
+    if (DEVMODE && isSortedByTime(sortedLongData) == false) {
         throw new Error("sortedLongData is not sorted")
     }
     let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime);
@@ -77,9 +79,41 @@ function getLineChartData(sortedLongData, startTime, endTime, locations) {
     // console.log(locationMeanData)
     // locationMeanData: [{location:String(int), time: timeObj, meanDamageValue: int}]
 
-    return [totalMeanData,locationMeanData].flat().filter((d)=>locations.includes(d.location))
+    return [totalMeanData, locationMeanData].flat().filter((d) => locations.includes(d.location))
 }
 
+// AREA chart functions
+function changeAreaChart(startTime, endTime, location, chart = areaChart) {
+    chart.setTime({startTime:startTime, endTime: endTime});
+    chart.data = getAreaChartData(data_long, startTime, endTime, location);
+    chart.updateVis()
+}
+
+function getAreaChartData(sortedLongData, startTime, endTime, location) {
+    // return long data: facility, location, time, meanDamageValue
+    if (VALID_LOCATIONS.includes(location) == false) {
+        throw new Error("invalid locations, they must be in VALID_LOCATIONS")
+    }
+    if (sortedLongData.length == 0) {
+        throw new Error("sortedLongData.length must be >= 1")
+    }
+    if (isSortedByTime(sortedLongData) == false) {
+        throw new Error("sortedLongData is not sorted")
+    }
+    let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime)
+
+    let rolledData = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location, d => d.facility, d => d.timeStr)
+    let locationData = rolledData.get(location)
+    // convert 
+    if (locationData == undefined) {
+        return []
+    } else {
+        let longData = Array.from(locationData).map(d => { return Array.from(d[1]).map(e => { return { location: location, facility: d[0],timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } }) }).flat()
+        return longData;
+    }
+}
+
+// helpers
 function filterSortedDataByTime(sortedLongData, startTime, endTime) {
     /**
      * filter the data by time, time complexity is O(n)
