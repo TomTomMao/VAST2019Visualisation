@@ -22,7 +22,7 @@ class BaseChart {
         thisObj.height = thisObj.config.containerHeight - thisObj.config.margin.top - thisObj.config.margin.bottom;
 
         // select the svg, setting width and height
-        thisObj.svg = d3.select(thisObj.config.parentElementId).attr("width", thisObj.containerWidth).attr("height", thisObj.containerHeight);
+        thisObj.svg = d3.select(thisObj.config.parentElementId).attr("width", thisObj.config.containerWidth).attr("height", thisObj.config.containerHeight);
 
         // drawing area
         thisObj.chart = thisObj.svg.append("g").attr("transform", `translate(${thisObj.config.margin.left}, ${thisObj.config.margin.top})`);
@@ -35,6 +35,7 @@ class BaseChart {
 }
 
 class TwoAxisTimeChart extends BaseChart {
+    //REFERENCE: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/2_d3_tutorial
     // x at bottom - scaleTime
     // y at left - scaleLinear
     constructor(config, data, time) {

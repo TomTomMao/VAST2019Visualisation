@@ -6,7 +6,7 @@ let tMin;
 let tMax;
 let lineChart;
 let barChart1;
-let barChart2
+let barChart2;
 let areaChart;
 async function main() {
     console.log("[test main.js]helo")
@@ -39,8 +39,12 @@ async function main() {
         throw new Error("data_long[data_long.length - 1].time != d3.max(data_long, d=>d.time), sorted data is not correct")
     }
 
-    lineChart = new LineChart(config = LINECHART_CONFIG, data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
-    areaChart = new AreaChart(config = AREACHART_CONFIG, data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
+    lineChart = new LineChart(config = LINECHART_CONFIG,
+        data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
+    areaChart = new AreaChart(config = AREACHART_CONFIG,
+        data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
+    barChart2 = new BarChart2(config = BARCHART2_CONFIG,
+        data = getBarChart2Data(data_long, tMin, tMax, "all"), major="meanDamageValue", minor="std")
 }
 
 // LINE chart functions
@@ -117,16 +121,26 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
     }
 }
 
-function getBarChart2Data(sortedLongData, startTime, endTime) {
+function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
+    /**
+     * @param {str} type it should be either "meanDamageValue", "count", or "std" or "all"
+     */
+
+
     let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime);
 
     let rolledDataMean = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location)
-    let flatMean = Array.from(rolledDataMean).map(d=>{return {location: d[0], meanDamageValue: d[1]}})
+    let flatMean = Array.from(rolledDataMean).map(d => { return { location: d[0], meanDamageValue: d[1] } })
     let rolledDataCount = d3.rollup(filteredData, v => d3.count(v, d => d.damageValue), d => d.location)
-    let flatCount = Array.from(rolledDataCount).map(d=>{return {location: d[0], count: d[1]}})
+    let flatCount = Array.from(rolledDataCount).map(d => { return { location: d[0], count: d[1] } })
     let rolledDataStd = d3.rollup(filteredData, v => d3.deviation(v, d => d.damageValue), d => d.location)
-    let flatStd = Array.from(rolledDataStd).map(d=>{return {location: d[0], std: d[1]}})
-    return {mean: flatMean, count: flatCount, std: flatStd}
+    let flatStd = Array.from(rolledDataStd).map(d => { return { location: d[0], std: d[1] } })
+    if (type == "all") {
+        return { meanDamageValue: flatMean, count: flatCount, std: flatStd }
+    } else {
+        return { meanDamageValue: flatMean, count: flatCount, std: flatStd }[type]
+    }
+    // return value looks like: [{location: str, type: int}]
 }
 
 // helpers

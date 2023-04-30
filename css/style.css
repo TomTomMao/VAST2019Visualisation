@@ -74,3 +74,13 @@
     width: 550px;
     height: 900px;
 }
+
+#bar-chart-2-title{
+    height: 20px;
+    text-align: center;
+}
+#bar-chart-2-container {
+    height: 840px;
+    width: 500px;
+}
+
