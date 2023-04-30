@@ -102,13 +102,13 @@ class BarChart2 extends BaseChart {
 
             } else {
 
-                if (data.meanDamageValue.hasOwnProperty(valid_location) == false) {
+                if (data.meanDamageValue.map((d)=>d.location!=valid_location).length == 0) {
                     data.meanDamageValue.push({ location: valid_location, meanDamageValue: DEFAULT_MEANDAMAGEVALUE_FOR_BAR_CHART_2 })
                 }
-                if (data.count.hasOwnProperty(valid_location) == false) {
+                if (data.count.map((d)=>d.location!=valid_location).length == 0) {
                     data.count.push({ location: valid_location, count: DEFAULT_COUNT_FOR_BAR_CHART_2 });
                 }
-                if (data.std.hasOwnProperty(valid_location) == false) {
+                if (data.std.map((d)=>d.location!=valid_location).length == 0) {
                     data.std.push({ location: valid_location, std: DEFAULT_STD_FOR_BAR_CHART_2 })
                 }
             }
