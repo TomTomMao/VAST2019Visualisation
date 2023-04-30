@@ -1,93 +1,78 @@
-body {
-  padding: 30px;
+/* mian */
+.main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin:1em auto;
+}
+
+/* left */
+#left-charts-container {
+    width: 1250px;
+    height: 900px;
+    
+}
+
+#line-chart-container,
+#line-chart-legends {
+    height: 400px;
+}
+
+#bar-chart-1-container {
+    height: 120px;
 }
 
 
-/* chart column */
-.chartsColumns {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  height: 600px;
+
+#line-chart-container,
+#bar-chart-1-container,
+#area-chart-container {
+    width: 1200px;
 }
 
-.chartsColumn {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 600px;
-  border: black 1px solid;
+#line-chart-legends {
+    width: 200px;
 }
 
-
-/* line chart lay out */
-#lineChart {
-  display: flex;
-  flex-direction: row;
+.chart,
+.charts,
+.legends {
+    border: 1px black solid;
 }
 
-/*  line chart svg */
-.mean-line {
-  fill: none;
-  stroke: black;
-  stroke-width: 1px;
+#area-chart-title{
+    text-align: center;
 }
 
-
-.location-line {
-  fill: none;
-  stroke-width: 1px;
+/* linechart */
+#line-chart-svg {
+    width: 1000px;
+    height: 400px;
+}
+#line-chart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+/* area chart */
+#area-chart-container {
+    height: 220px;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-
-/* line chart tooltip */
-#lineChartToolTip {
-  position: absolute;
-  background: white;
-  border: black 1px solid;
-  display: hidden;
+#area-chart-svg {
+    width: 1000px;
 }
 
-/* linechart legend */
-.line-chart-legend {
-  width: 20px;
-  text-align: center;
-}
-  
-.lineChartLocationButton {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 120px;
-  cursor: pointer;
-  padding-left:1em;
+#area-chart-legends{
+    width: 200px;
+    height: 220px;
 }
 
-.lineChartLocationButton:hover {
-  border: black 1px solid;
-  border-radius: 5px;
-}
-
-.lineChartColourLegend {
-  width: 1em;
-  height: 1em;
-  margin-right: 0.5em;
-}
-
-#lineChartLegend {
-  width: 140px;
-  border: black 1px solid;
-}
-
-/* bar chart */
-#barChartContext {
-  display: flex;
-  flex-direction: row;
-}
-
-/* stack area chart */
-
-#stackedAreaChart {
-  display: flex;
-  flex-direction: row;
+/* right */
+#right-charts-container {
+    width: 550px;
+    height: 900px;
 }

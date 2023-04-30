@@ -1,223 +1,85 @@
-let lineChart;
-let stactAreaChart;
-let barChartContext;
-let longBarChart;
-let data;
-let meanData;
-let aggregatedData;
-let groupedAggregatedData;
-const parseTime = d3.timeParse("%Y/%m/%d %H:%M");
-const parseTimeReverse = function (time) {
-  return (
-    time.getUTCFullYear() +
-    "/" +
-    (time.getUTCMonth() + 1) +
-    "/" +
-    time.getUTCDate() +
-    " " +
-    (time.getUTCHours() + 1) +
-    ":" +
-    time.getUTCMinutes()
-  );
-};
-
+let data_long;
+let parseTime = d3.timeParse("%Y/%m/%d %H:%M");
+let t1;
+let t2;
 async function main() {
-  data = await d3.csv("../data/data_long.csv");
-  meanData = await d3.csv("../data/data_mean.csv");
-  aggregatedData = await d3.csv("../data/data_long_aggregated_avg_time_facitily_location.csv")
-  // convert data to numbers, convert timestring to date object
-  data.forEach((d) => {
-    d.damage_value = +d.damage_value;
-    d.time = parseTime(d.time);
-  });
-  meanData.forEach((d) => {
-    d.damage_value = +d.damage_value;
-    d.time = parseTime(d.time);
-  });
-  aggregatedData.forEach((d) => {
-    d.mean_damage_value = +d.mean_damage_value;
-    d.time = parseTime(d.time);
-  });
-  
-  meanData.sort((a, b) => a.time - b.time);
-
-  stackedAreaChart = new StackedAreaChart(
-    {
-      parentElementId: "#stackedAreaChartSvg",
-      legends:"#stackedAreaChartLegend",
-      title: "#stackedAreaChartTitle",
-      containerWidth: 1000,
-      containerHeight: 200,
-      margin: {top: 20, right: 20, bottom: 30, left: 40}
-    }
-    ,_data=aggregatedData
-  )
-
-  lineChart = new LineChart(
-    (parentElementId = "#lineChartSvg"),
-    (tooltipElementId = "#lineChartToolTip"),
-    (data = data),
-    (meanData = meanData),
-    (legendElementId = "#lineChartLegendList"),
-    (colours = LINE_CHART_LOCATION_COLOURS),
-    (changeStackedAreaChart = function (location, timeStart, timeEnd) {
-      document.getElementById(
-        "stackedAreaChartTitle"
-      ).innerHTML = `Stacked Area Chart for ${location} from ${parseTimeReverse(
-        timeStart
-      )} to ${parseTimeReverse(timeEnd)}`;
+    console.log("[test main.js]helo")
+    data_long = await d3.csv("data/data_long.csv")
+    console.log("[test data loading]", data_long)
+    console.log("[test parseTime]", parseTime(data_long[0].time))
+    data_long.forEach((d) => {
+        try {
+            d.timeStr = d.time;
+            d.time = parseTime(d.time);
+            d.damageValue = parseInt(d.damage_value)
+        } catch {
+            console.log("ERROR", d)
+        }
     })
-  );
+    data_long = data_long.sort((a, b) => {
+        return a.time - b.time;
+    })
+    // for testing in console
+    t1 = data_long[30000].time;
+    t2 = data_long[40000].time;
 
-  lineChart.initVis();
-  lineChart.updateVis();
-  lineChart.renderVis();
+    
 
-  barChartContext = new BrushableTimeIntervalBarChart(
-    {
-      parentElementId: "#barChartContextSvg",
-      containerWidth: 1000,
-      containerHeight: 100,
-      margin: { top: 20, right: 20, bottom: 30, left: 40 },
-    },
-    (data = data),
-    (timeAttrName = "time"),
-    (valueAttrName = "damage_value"),
-    (callback = barChartContextCallback),
-    (intervalLength = 15 * MINUTE)
-  );
-  barChartContext.initVis();
-  barChartContext.updateVis();
-  barChartContext.renderVis();
+}
+function getLineChartData(sortedLongData, startTime, endTime, locations) {
+    /**
+     * 
+     * return a lng data from longData for multi-lines line chart, filtered by time. both side included
+     * The return data have columns: location, timeStr, meanDamageValue;
+     * The data are aggregated by averaging all facities of a time together
+     * @param {Array} sortedLongData Long data include location, time, damageValue, facility; Assume already sorted by time
+     * @param {object} startTime 
+     * @param {object} endTime Long data include location, time, damageValue, facility; Assume already sorted by time
+     * @param {object} locations Long data include location, time, damageValue, facility; Assume already sorted by time 
+    */
+    if (sortedLongData.length == 0) {
+        throw new Error("sortedLongData.length must be >= 1")
+    }
+    if (isSortedByTime(sortedLongData) == false) {
+        throw new Error("sortedLongData is not sorted")
+    }
+    let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime);
+    // console.log(filteredData)
+    let totalMeanData = Array.from(d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.timeStr)).map((d) => { return { location: "all", time: parseTime(d[0]), meanDamageValue: d[1] } })
+    // totalMeandata: [{location:"all", time: timeobj, meanDamageValue: int}]
+    let locationMeanData = Array.from(d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location, d => d.timeStr))
+        .map((d) => {
+            return Array.from(d[1])
+                .map((e) => { return { location: d[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
+        }).flat()
+    console.log(locationMeanData)
+    // locationMeanData: [{location:String(int), time: timeObj, meanDamageValue: int}]
 
-  let longBarChartConfig = (_config = {
-    parentElementId: "#longBarChartLongSvg",
-    containerWidth: 400,
-    containerHeight: 700,
-    margin: { top: 40, right: 20, bottom: 30, left: 40 },
-  });
-  let longBarChartEncoding = {
-    group: "location",
-    mainValueType: new MeanAggregator(),
-    secondValueType: new StdAggregator(),
-  };
-  longBarChart = new CompositeVerticalAggregatedBarChart(
-    longBarChartConfig,
-    data,
-    longBarChartEncoding,
-    "time",
-    "damage_value"
-  );
-  longBarChart.initVis();
-  longBarChart.updateVis();
-  longBarChart.renderVis();
-  
+    return [totalMeanData,locationMeanData].flat().filter((d)=>locations.includes(d.location))
 }
 
-main();
-// testToolTip();
-function testToolTip() {
-  let tooltip = new LineChartToolTipRender("#lineChartToolTip");
-  let data = {
-    time: "2020/1/1 0:0",
-    mean: 100,
-    locations: [
-      { name: "location1", MeanDamage: 10, colour: "red" },
-      { name: "location2", MeanDamage: 20, colour: "green" },
-      { name: "location3", MeanDamage: 30, colour: "blue" },
-      { name: "location4", MeanDamage: 40, colour: "yellow" },
-      { name: "location5", MeanDamage: 50, colour: "orange" },
-    ],
-  };
-  console.log(tooltip.renderTooltip(data));
+function filterSortedDataByTime(sortedLongData, startTime, endTime) {
+    /**
+     * filter the data by time, time complexity is O(n)
+     * @param {Array} sortedLongData a long data which is sorted by time. every element has a time attribute, it should be sorted
+     */
+    return sortedLongData.filter((d) => {
+        return startTime <= d.time && d.time <= endTime
+    })
 }
 
-function barChartContextCallback(timeStart, timeEnd) {
-  // console.log("start:", timeStart, "end:", timeEnd);
-  lineChart.changeTime(timeStart, timeEnd, true);
-  longBarChart.setTimeRange(timeStart, timeEnd);
-  stackedAreaChart.setTimeRange(timeStart, timeEnd);
+function isSortedByTime(data) {
+    // reference: https://codehandbook.org/check-if-an-array-sorted-javascript/
+    let right;
+    for (let left = 0; left < data.length - 1; left++) {
+        right = left + 1
+        try {
+            if (data[right].time - data[left].time < 0) return false;
+        } catch (error) {
+            console.log(left, data[left])
+            console.log(right, data[right])
+        }
+    }
+    return true;
 }
-
-function changeBarChartValueType(indexOfSelector) {
-  if (indexOfSelector == 1) {
-    let barChartContextObj = barChartContext;
-    return function (value) {
-      barChartContextObj.changeFilter(
-        barChartContextObj.locationFilter,
-        barChartContextObj.facilityFilter,
-        value
-      );
-    };
-  }
-}
-
-function changeBarChartLocationFilter(indexOfSelector) {
-  if (indexOfSelector == 1) {
-    let barChartContextObj = barChartContext;
-    return function (value) {
-      let locationFilter = [];
-      if (value == "all") {
-        locationFilter = "all";
-      } else {
-        locationFilter = [value];
-      }
-      barChartContextObj.changeFilter(
-        locationFilter,
-        barChartContextObj.facilityFilter,
-        barChartContextObj.aggregationFilter
-      );
-    };
-  }
-}
-
-function changeBarChartIntervalLength(indexOfSelector) {
-  if (indexOfSelector == 1) {
-    let barChartContextObj = barChartContext;
-    return function (value) {
-      const valueMapping = {
-        "15min": 15 * MINUTE,
-        "30min": 30 * MINUTE,
-        "1hour": HOUR,
-        "2hours": 2 * HOUR,
-        "4hours": 4 * HOUR,
-        "8hours": 8 * HOUR,
-        "12hours": 12 * HOUR,
-        "1day": DAY,
-      };
-      barChartContextObj.changeIntervalLength(valueMapping[value]);
-    };
-  }
-}
-
-function changeBarChartFacilityFilter(indexOfSelector) {
-  if (indexOfSelector == 1) {
-    let barChartContextObj = barChartContext;
-    return function (value) {
-      let facilityFilter = [];
-      if (value == "all") {
-        facilityFilter = "all";
-      } else {
-        facilityFilter = [value];
-      }
-      barChartContextObj.changeFilter(
-        barChartContextObj.locationFilter,
-        facilityFilter,
-        barChartContextObj.aggregationFilter
-      );
-    };
-  }
-}
-
-function aggregatorFactory(valueType) {
-  if (valueType == "mean") {
-    return new MeanAggregator();
-  }
-  if (valueType == "std") {
-    return new StdAggregator();
-  }
-  if (valueType == "count") {
-    return new CountAggregator();
-  }
-}
-
+main()
