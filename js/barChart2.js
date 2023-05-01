@@ -12,8 +12,8 @@ class BarChart2 extends BaseChart {
         thisObj.config.legendElementId = config.legendElementId;
         thisObj.major = major;
         thisObj.minor = minor;
-        thisObj.order = "major";
         thisObj.initVis();
+        thisObj.sort("major", true); // set order
     }
     initVis() {
         let thisObj = this;
@@ -51,16 +51,20 @@ class BarChart2 extends BaseChart {
         thisObj.getY = (d) => d.location
 
         // update scale domains
-        thisObj.xScaleMajor.domain(d3.extent(thisObj.data[thisObj.major], thisObj.getMajorX));
+        thisObj.xScaleMajor.domain(d3.extent(thisObj.getMajorData(), thisObj.getMajorX));
         console.log(thisObj.xScaleMajor);
         thisObj.xScaleMinor.domain(d3.extent(thisObj.data[thisObj.minor], thisObj.getMinorX));
         console.log(thisObj.xScaleMinor);
         if (thisObj.order=="major") {
-            thisObj.yScale.domain(thisObj.data[thisObj.major].map(thisObj.getY))
+            thisObj.yScale.domain(thisObj.getMajorData().map(thisObj.getY))
         } else if (thisObj.order=="minor") {
             thisObj.yScale.domain(thisObj.data[thisObj.minor].map(thisObj.getY))
         } else if (thisObj.order=="location") {
-            thisObj.yScale.domain(VALID_LOCATIONS.filter((d)=>d!="all"))
+            if (thisObj.desc == true) {
+                thisObj.yScale.domain(VALID_LOCATIONS.filter((d)=>d!="all"))
+            } else {
+                thisObj.yScale.domain(VALID_LOCATIONS.filter((d)=>d!="all").reverse())
+            }
         }
         thisObj.renderVis()
     }
@@ -115,16 +119,33 @@ class BarChart2 extends BaseChart {
         })
         thisObj.data = data;
     }
-    sort(attribute) {
+    getMajorData() {
+        let thisObj = this;
+        return thisObj.data[thisObj.major]
+    }
+    getMinorData() {
+        let thisObj = this;
+        return thisObj.data[thisObj.minor]
+    }
+    sort(attribute, desc=true) {
         let thisObj = this;
         thisObj.order = attribute;
+        thisObj.desc = desc
         if (attribute=="major") {
-            thisObj.data[thisObj.major].sort((a,b)=>{
-                return a[thisObj.major] - b[thisObj.major]
+            thisObj.getMajorData().sort((a,b)=>{
+                if (desc==true) {
+                    return a[thisObj.major] - b[thisObj.major]
+                } else {
+                    return b[thisObj.major] - a[thisObj.major]
+                }
             })
         } else if (attribute=="minor") {
             thisObj.data[thisObj.minor].sort((a,b)=>{
-                return a[thisObj.minor] - b[thisObj.minor]
+                if (desc==true) {
+                    return a[thisObj.minor] - b[thisObj.minor]
+                } else {
+                    return b[thisObj.minor] - a[thisObj.minor]
+                }
             })
         }
         thisObj.updateVis()
