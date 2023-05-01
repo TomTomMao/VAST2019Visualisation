@@ -9,10 +9,10 @@ let barChart1;
 let barChart2;
 let areaChart;
 async function main() {
-    console.log("[test main.js]helo")
+    // console.log("[test main.js]helo")
     data_long = await d3.csv("data/data_long.csv")
-    console.log("[test data loading]", data_long)
-    console.log("[test parseTime]", parseTime(data_long[0].time))
+    // console.log("[test data loading]", data_long)
+    // console.log("[test parseTime]", parseTime(data_long[0].time))
     data_long.forEach((d) => {
         try {
             d.timeStr = d.time;
@@ -163,13 +163,13 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
 
 // bar chart 1 functions
 function barChart1brushedCallBack(x1, x2) {
-    console.log("barChart1brushedCallback",x1, x2);
+    // console.log("barChart1brushedCallback",x1, x2);
 }
 function barChart1brushedendCallBack(x1, x2) {
     changeLineChart(x1,x2,lineChart.getLocations(), lineChart);
     changeBarChart2(x1,x2,barChart2.major, barChart2.minor, barChart2.order, barChart2.desc, barChart2)
     changeAreaChart(x1, x2, areaChart.getLocation(), areaChart)
-    console.log("barChart1brushedendCallBack",x1, x2)
+    // console.log("barChart1brushedendCallBack",x1, x2)
 }
 function changeBarChart1(timeLengthInMinutes, dataType, location, chart=barChart1) {
     /**
@@ -201,7 +201,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
 
     // filter data step by step, first filter the location, then filtere the time.
     let filteredData = sortedLongData; // The filteredData should always be sorted
-    console.log("copyed from sortedLongData:", filteredData)
+    // console.log("copyed from sortedLongData:", filteredData)
     if (DEVMODE == true && isSortedByTime(filteredData) == false) {
         throw new Error("the data must be sorted by time")
     }
@@ -212,7 +212,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         // filter the data only with that location
         filteredData = filteredData.filter((d) => d.location == location)
     }
-    console.log("filtered location:", filteredData)
+    // console.log("filtered location:", filteredData)
 
     // check if filteredData is still sorted to avoid silent error.
     if (DEVMODE == true && isSortedByTime(filteredData) == false) {
@@ -223,10 +223,10 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
     filteredData = filteredData.filter((d) => {
         return startTime <= d.time && d.time <= endTime
     })
-    console.log("filtered by time, filteredData:", filteredData)
+    // console.log("filtered by time, filteredData:", filteredData)
 
     let intervals = createTimeInterval(startTime, endTime, timeLengthInMinutes);
-    console.log("intervals:", intervals);
+    // console.log("intervals:", intervals);
 
     let intervalPointer = 0;
     filteredData.forEach((d) => {
@@ -248,7 +248,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         }
     }
     let rolledMap = d3.rollup(filteredData, v => getReducer(dataType)(v, d => d.damageValue), d => d.timeIntervalStr)
-    console.log("rolled", rolledMap)
+    // console.log("rolled", rolledMap)
     let rolledArray = Array.from(rolledMap).map((d) => {
         timeStartStr = d[0].split(", ")[0].slice(1)
         timeEndStr = d[0].split(", ")[1].slice(0,-1)
@@ -262,7 +262,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
             dataValue: d[1]
         }
     })
-    console.log("rolled", rolledMap)
+    // console.log("rolled", rolledMap)
     return rolledArray
 }
 
@@ -340,9 +340,9 @@ function createTimeInterval(startTime, endTime, timeLengthInMinutes) {
     }
     if (d3.timeMinute.offset(startTime, timeLengthInMinutes) >= endTime) {
         intervals.push(new TimeInterval(startTime, endTime, true, true))
-        console.log("flag1")
+        // console.log("flag1")
     } else if (d3.timeMinute.offset(startTime, timeLengthInMinutes) < endTime) {
-        console.log("flag2")
+        // console.log("flag2")
         let leftTime = startTime;
         let rightTime = d3.timeMinute.offset(leftTime, timeLengthInMinutes);
         while (rightTime < endTime) {

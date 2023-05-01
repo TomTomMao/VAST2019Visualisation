@@ -34,7 +34,7 @@ class AreaChart extends TwoAxisTimeChart {
             .x(function (d, i) { return thisObj.xScale(parseTime(d.data[0])); })
             .y0(function (d) { return thisObj.yScale(d[0]); })
             .y1(function (d) { return thisObj.yScale(d[1]); }))
-        thisObj.titleElement.innerHTML = `area chart for location ${thisObj.getLocation()}`
+        thisObj.titleElement.innerHTML = `Damage: location ${thisObj.getLocation()}`
     }
     getLocation() {
         let thisObj = this;

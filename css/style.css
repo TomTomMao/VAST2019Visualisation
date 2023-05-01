@@ -48,6 +48,47 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+/* linechart legend */
+.line-chart-legends {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.line-chart-legend {
+    padding-left: 2em;
+    display: flex;
+    flex-direction: row;
+}
+.rectangle {
+    width: 1em;
+    height:1em;
+    margin-right: 0.3em;
+    background-color: rgb(212, 212, 212);
+}
+.rectangle:hover{
+    border: 1px black solid;
+    box-sizing: border-box;
+}
+
+
+.legend-button-1 {
+    left: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    height: 1em;
+    background-color:beige;
+    cursor: pointer;
+}
+.legend-button-1:hover {
+    background-color: antiquewhite;
+    transition-duration: 0.2s;
+}
+.legend-button-1.selected {
+    background-color: black;
+}
+
+
 /* area chart */
 #area-chart-container {
     display:flex;
@@ -106,3 +147,4 @@
 .x-axis-major {
     color: rgb(0, 88, 170);
 }
+

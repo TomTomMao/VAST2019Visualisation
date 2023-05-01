@@ -53,9 +53,9 @@ class BarChart2 extends BaseChart {
 
         // update scale domains
         thisObj.xScaleMajor.domain([0, d3.max(thisObj.getMajorData(), thisObj.getMajorX)]);
-        console.log(thisObj.xScaleMajor);
+        // console.log(thisObj.xScaleMajor);
         thisObj.xScaleMinor.domain([0, d3.max(thisObj.getMinorData(), thisObj.getMinorX)]);
-        console.log(thisObj.xScaleMinor);
+        // console.log(thisObj.xScaleMinor);
         if (thisObj.order == "major") {
             thisObj.yScale.domain(thisObj.getMajorData().map(thisObj.getY))
         } else if (thisObj.order == "minor") {
@@ -135,7 +135,7 @@ class BarChart2 extends BaseChart {
             throw new Error(`data must have all three property: "meanDamageValue", "count", "std", but the data is: ${data}`)
         }
         // set missed location
-        console.log(data)
+        // console.log(data)
         VALID_LOCATIONS.forEach((valid_location) => {
             if (valid_location == "all") {
 
