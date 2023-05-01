@@ -238,7 +238,7 @@ function changeBarChart1(timeLengthInMinutes, dataType, location, chart = barCha
     chart.updateVis()
 }
 
-function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location) {
+function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location, facility="all") {
     /**
      * return the data between the time startTime and endTime. Time is like: [startTime, startTime+timeLengthInMinutes) , [ startTime+timeLengthInMinutes, startTime+2*timeLengthInMinutes)... + [startTime+(n-1)*timeLengthInMinutes, endTime]
      * if location == "all", the data only be filtered by the time,
@@ -271,6 +271,10 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         // filter the data only with that location
         filteredData = filteredData.filter((d) => d.location == location)
     }
+    if (facility != "all") {
+        // filter the data only with that facility
+        filteredData = filteredData.filter((d) => d.facility == facility)
+    }
     // console.log("filtered location:", filteredData)
 
     // check if filteredData is still sorted to avoid silent error.
@@ -278,11 +282,11 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         throw new Error("the data must be sorted by time")
     }
 
-    // filter the time
+    // filter the time and facility
     filteredData = filteredData.filter((d) => {
-        return startTime <= d.time && d.time <= endTime
+        return startTime <= d.time && d.time <= endTime 
     })
-    // console.log("filtered by time, filteredData:", filteredData)
+    console.log("filtered by time, filteredData:", filteredData)
 
     let intervals = createTimeInterval(startTime, endTime, timeLengthInMinutes);
     // console.log("intervals:", intervals);
