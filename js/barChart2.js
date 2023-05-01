@@ -163,6 +163,10 @@ class BarChart2 extends BaseChart {
         return thisObj.data[thisObj.minor]
     }
     sort(attribute, desc = true) {
+        /**
+         * @param {str} attribute "major" or "minor"
+         */
+        
         let thisObj = this;
         thisObj.order = attribute;
         thisObj.desc = desc

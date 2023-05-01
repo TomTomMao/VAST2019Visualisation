@@ -125,8 +125,12 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
 }
 
 
+
 // bar chart 2 functions
 function changeBarChart2(startTime, endTime, major, minor, order, desc, chart = barChart2) {
+    /**
+     * @param {str} major: "meanDamageValue" or "count", "std"
+    */
     // update bar chart, and update the bar chart title
     chart.setData(getBarChart2Data(data_long, startTime, endTime, type = "all"))
     chart.setMajor(major);
@@ -158,6 +162,14 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
 }
 
 // bar chart 1 functions
+
+function changeBarChart1(timeLengthInMinutes, dataType, location, chart=barChart1) {
+    /**
+     * change barchart1 's location, datatype
+     */
+    chart.data=getBarChart1Data(data_long, tMin, tMax, timeLengthInMinutes, dataType, location)
+    chart.updateVis()
+}
 
 function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location) {
     /**

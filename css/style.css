@@ -42,10 +42,7 @@
 }
 
 /* linechart */
-#line-chart-svg {
-    width: 1000px;
-    height: 400px;
-}
+
 #line-chart-container {
     display: flex;
     flex-direction: row;
@@ -94,14 +91,12 @@
     fill: rgb(0, 88, 170);
     stroke-width: 2px;
     stroke: black;
-    opacity: 0.5;
 }
 
 .minor-bar {
     fill: rgb(224, 121, 3);
     stroke-width: 2px;
     stroke: black;
-    opacity: 0.5;
 }
 
 .x-axis-minor {

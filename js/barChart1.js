@@ -43,12 +43,14 @@ class BarChart1 extends BaseChart {
             .data(thisObj.data)
             .join("rect")
             .attr('class', "bar")
+            .attr('x', (d) => (thisObj.xScale(thisObj.getX1(d))))
+            .transition()
+            .duration(1000)
+            .attr('y', d => thisObj.yScale(thisObj.getY(d))) // reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
+            .attr('height', d => thisObj.height - thisObj.yScale(thisObj.getY(d))) // reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
             .attr("width", (d) => {
                 return thisObj.xScale(thisObj.getX2(d)) - thisObj.xScale(thisObj.getX1(d))
             })
-            .attr('x', (d) => (thisObj.xScale(thisObj.getX1(d))))
-            .attr('height', d => thisObj.height - thisObj.yScale(thisObj.getY(d))) // reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
-            .attr('y', d => thisObj.yScale(thisObj.getY(d))) // reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
         thisObj.xAxisG.call(thisObj.xAxis);
         thisObj.yAxisG.call(thisObj.yAxis);
     }

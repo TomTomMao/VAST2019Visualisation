@@ -8,7 +8,7 @@ for (let i = 1; i <= VALID_FACILITIES.length; i++) {
 }
 const LINECHART_CONFIG = {
     parentElementId: "#line-chart-svg",
-    containerWidth: 1200,
+    containerWidth: 1000,
     containerHeight: 400,
     margin: { left: 40, top: 20, right: 30, bottom: 20 },
     toolTipElementId: "#line-chart-tooltip",
@@ -16,7 +16,7 @@ const LINECHART_CONFIG = {
 };
 const AREACHART_CONFIG = {
     parentElementId: "#area-chart-svg",
-    containerWidth: 1200,
+    containerWidth: 1000,
     containerHeight: 220,
     margin: { left: 40, top: 20, right: 30, bottom: 20 },
     legendElementId: "#area-chart-legend",
@@ -25,7 +25,7 @@ const AREACHART_CONFIG = {
 
 const BARCHART1_CONFIG = {
     parentElementId: "#bar-chart-1-svg",
-    containerWidth: 1200,
+    containerWidth: 1000,
     containerHeight: 150,
     margin: { left: 40, top: 30, right: 30, bottom: 30 }
 }
