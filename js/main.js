@@ -172,6 +172,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
      *              timeEndStr:"2020/04/07 11:25", 
      *              timeStart: parseTime("2020/04/07 11:10"), 
      *              timeEnd: parseTime("2020/04/07 11:25"), 
+     *              location: location
      *              dataType: meanDamageValue or count or std,
      *              dataValue: int}]
      */
@@ -210,30 +211,37 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         // keep increment intervalPointer until the time in the intervals[intervalPointer] 
         while (intervals[intervalPointer].isInside(d.time) == false) {
             intervalPointer += 1;
-        } 
+        }
         d.interval = intervals[intervalPointer]
         d.timeIntervalStr = d.interval.toString()
     })
     // each entry of filteredData has a time Interval object and a timeIntervalStr
     let getReducer = (dataType) => {
-        if (dataType=="meanDamageValue") {
+        if (dataType == "meanDamageValue") {
             return d3.mean
-        } else if (dataType=="count") {
+        } else if (dataType == "count") {
             return d3.count
-        } else if (dataType=="std") {
+        } else if (dataType == "std") {
             return d3.deviation
         }
     }
-    let rolled = d3.rollup(filteredData, v => getReducer(dataType)(v, d=>d.damageValue), d=>d.timeIntervalStr)
-    console.log("rolled", rolled)
-    return Array.from(rolled).map((d)=>{
-        return {timeStartStr: d[0], 
-                timeEndStr:d[0], 
-                timeStart: d[0], 
-                timeEnd: d[0], 
-                dataType: dataType,
-                dataValue: d[1]}
+    let rolledMap = d3.rollup(filteredData, v => getReducer(dataType)(v, d => d.damageValue), d => d.timeIntervalStr)
+    console.log("rolled", rolledMap)
+    let rolledArray = Array.from(rolledMap).map((d) => {
+        timeStartStr = d[0].split(", ")[0].slice(1)
+        timeEndStr = d[0].split(", ")[1].slice(0,-1)
+        return {
+            timeStartStr: timeStartStr,
+            timeEndStr: timeEndStr,
+            timeStart: parseTime(timeStartStr),
+            timeEnd: parseTime(timeEndStr),
+            dataType: dataType,
+            location: location,
+            dataValue: d[1]
+        }
     })
+    console.log("rolled", rolledMap)
+    return rolledArray
 }
 
 // helpers
