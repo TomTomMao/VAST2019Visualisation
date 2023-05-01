@@ -78,18 +78,7 @@ class LineChart extends TwoAxisTimeChart {
             })
         updateLineChartLegends(thisObj)
     }
-    // colourScale(location) {
-    //     let thisObj = this;
-    //     let sortedLocations = thisObj.getLocations().sort((a,b)=>{
-    //         if (a === "all") {
-    //             return true
-    //         } else {
-    //             return parseInt(a) - parseInt(b)
-    //         }
-    //     })
-    //     let index = sortedLocations.indexOf(location)
-    //     return thisObj.colours[index]
-    // }
+
     colourScale(location) {
         let thisObj = this;
         return thisObj.colours[thisObj.coloursDomain.indexOf(location)]

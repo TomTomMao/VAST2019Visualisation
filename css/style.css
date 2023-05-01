@@ -1,3 +1,6 @@
+* {
+    box-sizing: border-box;
+}
 /* mian */
 .main {
     display: flex;
@@ -70,24 +73,28 @@
     border: 1px black solid;
     box-sizing: border-box;
 }
-
-
-.legend-button-1 {
+.legend-button-1,.legend-button-2 {
     left: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
     height: 1em;
     background-color:beige;
     cursor: pointer;
 }
-.legend-button-1:hover {
-    background-color: antiquewhite;
-    transition-duration: 0.2s;
+.legend-button-1:hover,.legend-button-2:hover {
+    border: 1px black solid;
+
 }
 .legend-button-1.selected {
     background-color: black;
 }
-
+.legend-text {
+    margin-left: 1em
+}
+/* #legend-button-2-all {
+    cursor:not-allowed;
+} */
+.legend-button-2 {
+    background-color: aqua;
+}
 
 /* area chart */
 #area-chart-container {

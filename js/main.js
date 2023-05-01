@@ -42,9 +42,9 @@ async function main() {
     lineChart = new LineChart(config = LINECHART_CONFIG,
         data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
     areaChart = new AreaChart(config = AREACHART_CONFIG,
-        data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
+        data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax }, "all")
     barChart1 = new BarChart1(config = BARCHART1_CONFIG,
-        data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH,"count", "all"), {brushedCallback: barChart1brushedCallBack, brushedendCallback: barChart1brushedendCallBack})
+        data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH, "count", "all"), { brushedCallback: barChart1brushedCallBack, brushedendCallback: barChart1brushedendCallBack })
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
@@ -93,6 +93,7 @@ function getLineChartData(sortedLongData, startTime, endTime, locations) {
 function changeAreaChart(startTime, endTime, location, chart = areaChart) {
     chart.setTime({ startTime: startTime, endTime: endTime });
     chart.data = getAreaChartData(data_long, startTime, endTime, location);
+    chart.setLocation(location)
     chart.updateVis()
 }
 
@@ -108,19 +109,29 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
         throw new Error("sortedLongData is not sorted")
     }
     let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime)
-
-    let rolledData = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location, d => d.facility, d => d.timeStr)
-    let locationData = rolledData.get(location)
-    // convert 
-    if (locationData == undefined) {
-        return []
-    } else {
-        let longData = Array.from(locationData).
-            map(d => {
-                return Array.from(d[1])
-                    .map(e => { return { location: location, facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
-            }).flat()
+    if (location == "all") {
+        let rolledData = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.facility, d => d.timeStr);
+        let longData = Array.from(rolledData).map(d=>{
+            return Array.from(d[1])
+                .map(e => { return {location: "all", facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1]}})
+        }).flat();
         return longData;
+    } else {
+
+        let rolledData = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.location, d => d.facility, d => d.timeStr)
+
+        let locationData = rolledData.get(location)
+        // convert 
+        if (locationData == undefined) {
+            return []
+        } else {
+            let longData = Array.from(locationData).
+                map(d => {
+                    return Array.from(d[1])
+                        .map(e => { return { location: location, facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
+                }).flat()
+            return longData;
+        }
     }
 }
 
@@ -166,16 +177,16 @@ function barChart1brushedCallBack(x1, x2) {
     // console.log("barChart1brushedCallback",x1, x2);
 }
 function barChart1brushedendCallBack(x1, x2) {
-    changeLineChart(x1,x2,lineChart.getLocations(), lineChart);
-    changeBarChart2(x1,x2,barChart2.major, barChart2.minor, barChart2.order, barChart2.desc, barChart2)
+    changeLineChart(x1, x2, lineChart.getLocations(), lineChart);
+    changeBarChart2(x1, x2, barChart2.major, barChart2.minor, barChart2.order, barChart2.desc, barChart2)
     changeAreaChart(x1, x2, areaChart.getLocation(), areaChart)
     // console.log("barChart1brushedendCallBack",x1, x2)
 }
-function changeBarChart1(timeLengthInMinutes, dataType, location, chart=barChart1) {
+function changeBarChart1(timeLengthInMinutes, dataType, location, chart = barChart1) {
     /**
      * change barchart1 's location, datatype
      */
-    chart.data=getBarChart1Data(data_long, tMin, tMax, timeLengthInMinutes, dataType, location)
+    chart.data = getBarChart1Data(data_long, tMin, tMax, timeLengthInMinutes, dataType, location)
     chart.updateVis()
 }
 
@@ -251,7 +262,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
     // console.log("rolled", rolledMap)
     let rolledArray = Array.from(rolledMap).map((d) => {
         timeStartStr = d[0].split(", ")[0].slice(1)
-        timeEndStr = d[0].split(", ")[1].slice(0,-1)
+        timeEndStr = d[0].split(", ")[1].slice(0, -1)
         return {
             timeStartStr: timeStartStr,
             timeEndStr: timeEndStr,

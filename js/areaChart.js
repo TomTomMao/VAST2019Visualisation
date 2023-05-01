@@ -1,9 +1,10 @@
 class AreaChart extends TwoAxisTimeChart {
     // reference: https://d3-graph-gallery.com/graph/stackedarea_basic.html
-    constructor(config, data, time) {
+    constructor(config, data, time, location) {
         super(config, data, time);
         this.config.legendElementId = config.legendElementId
         this.config.titleElementId = config.titleElementId
+        this.location = location
         this.initVis()
     }
     initVis() {
@@ -36,8 +37,12 @@ class AreaChart extends TwoAxisTimeChart {
             .y1(function (d) { return thisObj.yScale(d[1]); }))
         thisObj.titleElement.innerHTML = `Damage: location ${thisObj.getLocation()}`
     }
+    setLocation(location) {
+        let thisObj = this;
+        thisObj.location = location
+    }
     getLocation() {
         let thisObj = this;
-        return thisObj.data[0].location
+        return thisObj.location
     }
 }
