@@ -13,7 +13,7 @@ class BarChart2 extends BaseChart {
         thisObj.major = major;
         thisObj.minor = minor;
         thisObj.initVis();
-        thisObj.sort("major", true); // set order
+        
     }
     initVis() {
         let thisObj = this;
@@ -41,6 +41,7 @@ class BarChart2 extends BaseChart {
         thisObj.yAxis = d3.axisLeft(thisObj.yScale)
         // y axis group
         thisObj.yAxisG = thisObj.chart.append("g").attr("class", "axis y-axis")
+        thisObj.sort("major", true); // set order
         thisObj.updateVis();
     }
     updateVis() {
@@ -51,19 +52,19 @@ class BarChart2 extends BaseChart {
         thisObj.getY = (d) => d.location
 
         // update scale domains
-        thisObj.xScaleMajor.domain(d3.extent(thisObj.getMajorData(), thisObj.getMajorX));
+        thisObj.xScaleMajor.domain([0, d3.max(thisObj.getMajorData(), thisObj.getMajorX)]);
         console.log(thisObj.xScaleMajor);
-        thisObj.xScaleMinor.domain(d3.extent(thisObj.data[thisObj.minor], thisObj.getMinorX));
+        thisObj.xScaleMinor.domain([0, d3.max(thisObj.getMinorData(), thisObj.getMinorX)]);
         console.log(thisObj.xScaleMinor);
-        if (thisObj.order=="major") {
+        if (thisObj.order == "major") {
             thisObj.yScale.domain(thisObj.getMajorData().map(thisObj.getY))
-        } else if (thisObj.order=="minor") {
-            thisObj.yScale.domain(thisObj.data[thisObj.minor].map(thisObj.getY))
-        } else if (thisObj.order=="location") {
+        } else if (thisObj.order == "minor") {
+            thisObj.yScale.domain(thisObj.getMinorData().map(thisObj.getY))
+        } else if (thisObj.order == "location") {
             if (thisObj.desc == true) {
-                thisObj.yScale.domain(VALID_LOCATIONS.filter((d)=>d!="all"))
+                thisObj.yScale.domain(VALID_LOCATIONS.filter((d) => d != "all"))
             } else {
-                thisObj.yScale.domain(VALID_LOCATIONS.filter((d)=>d!="all").reverse())
+                thisObj.yScale.domain(VALID_LOCATIONS.filter((d) => d != "all").reverse())
             }
         }
         thisObj.renderVis()
@@ -71,9 +72,40 @@ class BarChart2 extends BaseChart {
     renderVis() {
         let thisObj = this;
         super.renderVis();
+
+        // this class is inherited from baseChart which don't render any axis
         thisObj.xAxisGMajor.call(thisObj.xAxisMajor);
         thisObj.xAxisGMinor.call(thisObj.xAxisMinor);
         thisObj.yAxisG.call(thisObj.yAxis);
+
+        // render bars, partially reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
+        // major bar
+        thisObj.chart.selectAll(".major-bar")
+            .data(thisObj.getMajorData())
+            .join('rect')
+            .attr('class', 'major-bar')
+            .attr('x', 0)
+            .transition()
+            .duration(1000)
+            .attr('y', (d) => thisObj.yScale(thisObj.getY(d)))
+            .attr('height', thisObj.yScale.bandwidth())
+            .attr('width', (d) => {
+                return thisObj.xScaleMajor(thisObj.getMajorX(d))
+            })
+
+        // minor bar
+        thisObj.chart.selectAll(".minor-bar")
+            .data(thisObj.getMinorData())
+            .join('rect')
+            .attr('class', 'minor-bar')
+            .attr('x', 0)
+            .transition()
+            .duration(1000)
+            .attr('y', (d) => thisObj.yScale(thisObj.getY(d)) + thisObj.yScale.bandwidth() / 4)
+            .attr('height', thisObj.yScale.bandwidth() / 2)
+            .attr('width', (d) => {
+                return thisObj.xScaleMinor(thisObj.getMinorX(d))
+            })
     }
     setMajor(major) {
         /**
@@ -81,6 +113,7 @@ class BarChart2 extends BaseChart {
          */
         let thisObj = this;
         thisObj.major = major;
+        thisObj.updateVis()
     }
     setMinor(minor) {
         /**
@@ -88,6 +121,7 @@ class BarChart2 extends BaseChart {
          */
         let thisObj = this;
         thisObj.minor = minor;
+        thisObj.updateVis()
     }
     setData(data) {
         /**
@@ -106,13 +140,13 @@ class BarChart2 extends BaseChart {
 
             } else {
 
-                if (data.meanDamageValue.map((d)=>d.location!=valid_location).length == 0) {
+                if (data.meanDamageValue.map((d) => d.location != valid_location).length == 0) {
                     data.meanDamageValue.push({ location: valid_location, meanDamageValue: DEFAULT_MEANDAMAGEVALUE_FOR_BAR_CHART_2 })
                 }
-                if (data.count.map((d)=>d.location!=valid_location).length == 0) {
+                if (data.count.map((d) => d.location != valid_location).length == 0) {
                     data.count.push({ location: valid_location, count: DEFAULT_COUNT_FOR_BAR_CHART_2 });
                 }
-                if (data.std.map((d)=>d.location!=valid_location).length == 0) {
+                if (data.std.map((d) => d.location != valid_location).length == 0) {
                     data.std.push({ location: valid_location, std: DEFAULT_STD_FOR_BAR_CHART_2 })
                 }
             }
@@ -127,21 +161,21 @@ class BarChart2 extends BaseChart {
         let thisObj = this;
         return thisObj.data[thisObj.minor]
     }
-    sort(attribute, desc=true) {
+    sort(attribute, desc = true) {
         let thisObj = this;
         thisObj.order = attribute;
         thisObj.desc = desc
-        if (attribute=="major") {
-            thisObj.getMajorData().sort((a,b)=>{
-                if (desc==true) {
+        if (attribute == "major") {
+            thisObj.getMajorData().sort((a, b) => {
+                if (desc == true) {
                     return a[thisObj.major] - b[thisObj.major]
                 } else {
                     return b[thisObj.major] - a[thisObj.major]
                 }
             })
-        } else if (attribute=="minor") {
-            thisObj.data[thisObj.minor].sort((a,b)=>{
-                if (desc==true) {
+        } else if (attribute == "minor") {
+            thisObj.getMinorData().sort((a, b) => {
+                if (desc == true) {
                     return a[thisObj.minor] - b[thisObj.minor]
                 } else {
                     return b[thisObj.minor] - a[thisObj.minor]
