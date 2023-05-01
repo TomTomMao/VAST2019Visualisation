@@ -45,6 +45,7 @@ async function main() {
         data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major="meanDamageValue", minor="std")
+    document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
 }
 
 // LINE chart functions
@@ -121,6 +122,17 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
     }
 }
 
+
+// bar chart 2 functions
+function changeBarChart2(startTime, endTime, major, minor, order, desc, chart=barChart2) {
+    // update bar chart, and update the bar chart title
+    chart.setData(getBarChart2Data(data_long, startTime, endTime, type="all"))
+    chart.setMajor(major);
+    chart.setMinor(minor);
+    chart.sort(order,desc)
+    
+}
+
 function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
     /**
      * @param {str} type it should be either "meanDamageValue", "count", or "std" or "all"
@@ -142,6 +154,7 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
     }
     // return value looks like: [{location: str, type: int}]
 }
+
 
 // helpers
 function filterSortedDataByTime(sortedLongData, startTime, endTime) {

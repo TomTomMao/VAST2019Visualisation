@@ -84,9 +84,9 @@ class BarChart2 extends BaseChart {
             .data(thisObj.getMajorData())
             .join('rect')
             .attr('class', 'major-bar')
-            .attr('x', 0)
             .transition()
             .duration(1000)
+            .attr('x', 0)
             .attr('y', (d) => thisObj.yScale(thisObj.getY(d)))
             .attr('height', thisObj.yScale.bandwidth())
             .attr('width', (d) => {
@@ -98,14 +98,15 @@ class BarChart2 extends BaseChart {
             .data(thisObj.getMinorData())
             .join('rect')
             .attr('class', 'minor-bar')
-            .attr('x', 0)
             .transition()
             .duration(1000)
+            .attr('x', 0)
             .attr('y', (d) => thisObj.yScale(thisObj.getY(d)) + thisObj.yScale.bandwidth() / 4)
             .attr('height', thisObj.yScale.bandwidth() / 2)
             .attr('width', (d) => {
                 return thisObj.xScaleMinor(thisObj.getMinorX(d))
             })
+            
     }
     setMajor(major) {
         /**

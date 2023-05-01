@@ -2,6 +2,7 @@ const DEVMODE = true;
 const VALID_LOCATIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "all"];
 const VALID_FACILITIES = ['sewer_and_water', 'power', 'roads_and_bridges', 'medical', 'buildings'];
 const VALID_FACILITIES_INDEX = []
+const VALID_BAR_CHART_X = ["meanDamageValue", "count", "std"]
 for (let i = 1; i <= VALID_FACILITIES.length; i++) {
     VALID_FACILITIES_INDEX.push(i)
 }
