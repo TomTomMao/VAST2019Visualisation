@@ -23,6 +23,13 @@ const AREACHART_CONFIG = {
     titleElementId: "#area-chart-title"
 };
 
+const BARCHART1_CONFIG = {
+    parentElementId: "#bar-chart-1-svg",
+    containerWidth: 1200,
+    containerHeight: 150,
+    margin: { left: 40, top: 30, right: 30, bottom: 30 }
+}
+
 const BARCHART2_CONFIG = {
     parentElementId: "#bar-chart-2-svg",
     containerWidth: 500,
@@ -31,7 +38,7 @@ const BARCHART2_CONFIG = {
     legendElementId: "#bar-chart-2-legend",
     titleElementId: "#bar-chart-2-title"
 }
-
+DEFAULT_BAR_CHART_1_INTERVAL_LENGTH = 15 // minutes
 DEFAULT_MEANDAMAGEVALUE_FOR_BAR_CHART_2 = 0
 DEFAULT_COUNT_FOR_BAR_CHART_2 = 0
 DEFAULT_STD_FOR_BAR_CHART_2 = 0

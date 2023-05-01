@@ -43,6 +43,8 @@ async function main() {
         data = getLineChartData(data_long, tMin, tMax, ["all", "1"]), { startTime: tMin, endTime: tMax })
     areaChart = new AreaChart(config = AREACHART_CONFIG,
         data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
+    barChart1 = new BarChart1(config = BARCHART1_CONFIG,
+        data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH,"count", "all"))
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
