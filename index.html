@@ -19,6 +19,72 @@
 
       <div class="chart" id="bar-chart-1-container">
         <svg id="bar-chart-1-svg"></svg>
+        <table>
+          <tr>
+            <td>ValueType</td>
+            <td>
+              <select class="bar-selector" name="barChartValueType" id="barChartValueType">
+                <option value="count">count</option>
+                <option value="meanDamageValue">mean</option>
+                <option value="std">std</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Location</td>
+            <td>
+              <select class="bar-selector" name="barChartLocationFilter" id="barChartLocationFilter">
+                <option value="all">all</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Facility</td>
+            <td><select class="bar-selector" name="barChartFacilityFilter" id="barChartFacilityFilter">
+              <option value="all">all</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>Interval Length</td>
+            <td><select class="bar-selector" name="barChartIntervalLength" id="barChartIntervalLength">
+              <option value="15">15 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60">1 hour</option>
+              <option value="120">2 hours</option>
+              <option value="180">3 hours</option>
+              <option value="240">4 hours</option>
+              <option value="360">6 hours</option>
+              <option value="480">8 hours</option>
+              <option value="720">12 hours</option>
+              <option value="960">16 hours</option>
+              <option value="1440">24 hours</option>
+            </select></td>
+          </tr>
+        </table>
       </div>
 
 
@@ -27,8 +93,8 @@
       </h2>
       <div class="chart" id="area-chart-container">
         <svg id="area-chart-svg"></svg>
-        <div class="legends" id="area-chart-legends">
-        </div>
+        <ul class="legends" id="area-chart-legends">
+        </ul>
       </div>
     </div>
     <div class="charts" id="right-charts-container">

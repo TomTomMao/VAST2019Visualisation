@@ -54,7 +54,7 @@ class BarChart1 extends BaseChart {
     renderVis() {
         let thisObj = this;
         thisObj.chart.selectAll(".bar")
-            .data(thisObj.data)
+            .data(thisObj.data, (d)=>d.timeStartStr)
             .join("rect")
             .attr('class', "bar")
             .attr('x', (d) => (thisObj.xScale(thisObj.getX1(d))))

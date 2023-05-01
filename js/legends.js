@@ -1,4 +1,3 @@
-
 function updateLineChartLegends(chart = lineChart) {
     let container = document.querySelector(chart.config.legendElementId);
     container.innerHTML = "";
@@ -53,4 +52,13 @@ function toggleLineChartLocations(newLocation, chart) {
         alert(`you can't choose more than ${MAX_LINE_CHART_LOCATION} locations`);
     }
 }
-
+function updateAreaChartLegends(chart=areaChart) {
+    let container = document.querySelector(chart.config.legendElementId);
+    container.innerHTML = "<ul></ul>";
+    VALID_FACILITIES.forEach((facility) => {
+        let li =document.createElement("li")
+        li.innerHTML = `${facility}`
+        li.style.color = chart.colourScale(facility)
+        container.appendChild(li)
+    })
+}

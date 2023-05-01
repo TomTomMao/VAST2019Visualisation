@@ -25,7 +25,10 @@ class AreaChart extends TwoAxisTimeChart {
         let thisObj = this;
         super.renderVis()
         let groupedData = d3.group(thisObj.data, d => d.timeStr)
-        let stackedData = d3.stack().keys(VALID_FACILITIES_INDEX).value(function (d, key) { if (d[1][key] != undefined) { return d[1][key].meanDamageValue } else { return 0 } })(groupedData)
+        let stackedData = d3.stack().keys(VALID_FACILITIES_INDEX).value(function (d, key) { if (d[1][key - 1] != undefined) { return d[1][key - 1].meanDamageValue } else { return 0 } })(groupedData)
+        console.log("data", data)
+        console.log("groupedData", groupedData)
+        console.log("stackedData", stackedData)
         thisObj.chart.selectAll("path").remove();
         thisObj.chart.selectAll("area")
             .data(stackedData)
@@ -36,6 +39,7 @@ class AreaChart extends TwoAxisTimeChart {
             .y0(function (d) { return thisObj.yScale(d[0]); })
             .y1(function (d) { return thisObj.yScale(d[1]); }))
         thisObj.titleElement.innerHTML = `Damage: location ${thisObj.getLocation()}`
+        updateAreaChartLegends(thisObj)
     }
     setLocation(location) {
         let thisObj = this;

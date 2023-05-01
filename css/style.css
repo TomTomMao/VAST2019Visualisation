@@ -133,7 +133,10 @@
     fill: black;
     stroke: black;
 }
-
+#bar-chart-1-container {
+    display: flex;
+    flex-direction: left   ;
+}
 /* bar chart 2*/
 .major-bar {
     fill: rgb(0, 88, 170);

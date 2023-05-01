@@ -48,6 +48,51 @@ async function main() {
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
+    document.getElementById("barChartValueType").addEventListener("change", function() {
+        let barChartValueType = document.getElementById("barChartValueType").value;
+        let barChartLocation = document.getElementById("barChartLocationFilter").value;
+        let barChartFacility = document.getElementById("barChartFacilityFilter").value;
+        let barChartIntervalLength = parseInt(document.getElementById("barChartIntervalLength").value);
+        console.log("barChartValueType changed, value:", barChartValueType);
+        console.log("barChartLocation changed, value:", barChartLocation);
+        console.log("barChartFacility changed, value:", barChartFacility);
+        console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+    })
+    document.getElementById("barChartLocationFilter").addEventListener("change", function() {
+        let barChartValueType = document.getElementById("barChartValueType").value;
+        let barChartLocation = document.getElementById("barChartLocationFilter").value;
+        let barChartFacility = document.getElementById("barChartFacilityFilter").value;
+        let barChartIntervalLength = parseInt(document.getElementById("barChartIntervalLength").value);
+        console.log("barChartValueType changed, value:", barChartValueType);
+        console.log("barChartLocation changed, value:", barChartLocation);
+        console.log("barChartFacility changed, value:", barChartFacility);
+        console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+    })
+    document.getElementById("barChartFacilityFilter").addEventListener("change", function() {
+        let barChartValueType = document.getElementById("barChartValueType").value;
+        let barChartLocation = document.getElementById("barChartLocationFilter").value;
+        let barChartFacility = document.getElementById("barChartFacilityFilter").value;
+        let barChartIntervalLength = parseInt(document.getElementById("barChartIntervalLength").value);
+        console.log("barChartValueType changed, value:", barChartValueType);
+        console.log("barChartLocation changed, value:", barChartLocation);
+        console.log("barChartFacility changed, value:", barChartFacility);
+        console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+    })
+    document.getElementById("barChartIntervalLength").addEventListener("change", function() {
+        let barChartValueType = document.getElementById("barChartValueType").value;
+        let barChartLocation = document.getElementById("barChartLocationFilter").value;
+        let barChartFacility = document.getElementById("barChartFacilityFilter").value;
+        let barChartIntervalLength = parseInt(document.getElementById("barChartIntervalLength").value);
+        console.log("barChartValueType changed, value:", barChartValueType);
+        console.log("barChartLocation changed, value:", barChartLocation);
+        console.log("barChartFacility changed, value:", barChartFacility);
+        console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+    })
+    
 }
 
 // LINE chart functions
@@ -173,6 +218,9 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
 }
 
 // bar chart 1 functions
+function selectorChangeCallback() {
+
+}
 function barChart1brushedCallBack(x1, x2) {
     // console.log("barChart1brushedCallback",x1, x2);
 }
