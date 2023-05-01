@@ -1,7 +1,12 @@
 class BarChart1 extends BaseChart {
-    constructor(config, data) {
+    constructor(config, data, callbacks) {
         super(config, data);
-        this.initVis();
+        let thisObj= this;
+        thisObj.callbacks = {
+            brushedCallback: callbacks.brushedCallback,
+            brushedendCallback: callbacks.brushedendCallback
+        }
+        thisObj.initVis();
     }
     initVis() {
         let thisObj = this;
@@ -22,6 +27,15 @@ class BarChart1 extends BaseChart {
             .axisLeft(thisObj.yScale)
         // y group
         thisObj.yAxisG = thisObj.chart.append("g").attr("class", "axis y-axis");
+
+        // reference for the brusher: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/4_d3_tutorial
+        thisObj.brush = d3.brushX()
+            .extent([[0,0], [thisObj.width, thisObj.height]])
+            .on('brush', (d) => {thisObj.brushed(d)})
+            .on('end', (d) => thisObj.brushedend(d))
+        thisObj.brushG = thisObj.chart.append('g')
+                            .attr('class', 'brush x-brush')
+                            .call(thisObj.brush)
         this.updateVis();
     }
     updateVis() {
@@ -53,5 +67,15 @@ class BarChart1 extends BaseChart {
             })
         thisObj.xAxisG.call(thisObj.xAxis);
         thisObj.yAxisG.call(thisObj.yAxis);
+    }
+    brushed ({selection}) {
+        let thisObj = this;
+        let [x1, x2] = selection.map(thisObj.xScale.invert, thisObj.xScale);
+        thisObj.callbacks.brushedCallback(x1, x2)
+    }
+    brushedend({selection}) {
+        let thisObj = this;
+        let [x1, x2] = selection.map(thisObj.xScale.invert, thisObj.xScale);
+        thisObj.callbacks.brushedendCallback(x1, x2)
     }
 }

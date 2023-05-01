@@ -44,7 +44,7 @@ async function main() {
     areaChart = new AreaChart(config = AREACHART_CONFIG,
         data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
     barChart1 = new BarChart1(config = BARCHART1_CONFIG,
-        data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH,"count", "all"))
+        data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH,"count", "all"), {brushedCallback: barChart1brushedCallBack, brushedendCallback: barChart1brushedendCallBack})
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
@@ -162,7 +162,15 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
 }
 
 // bar chart 1 functions
-
+function barChart1brushedCallBack(x1, x2) {
+    console.log("barChart1brushedCallback",x1, x2);
+}
+function barChart1brushedendCallBack(x1, x2) {
+    changeLineChart(x1,x2,lineChart.getLocations(), lineChart);
+    changeBarChart2(x1,x2,barChart2.major, barChart2.minor, barChart2.order, barChart2.desc, barChart2)
+    changeAreaChart(x1, x2, areaChart.getLocation(), areaChart)
+    console.log("barChart1brushedendCallBack",x1, x2)
+}
 function changeBarChart1(timeLengthInMinutes, dataType, location, chart=barChart1) {
     /**
      * change barchart1 's location, datatype

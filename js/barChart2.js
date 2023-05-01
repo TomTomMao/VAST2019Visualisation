@@ -169,7 +169,7 @@ class BarChart2 extends BaseChart {
         
         let thisObj = this;
         thisObj.order = attribute;
-        thisObj.desc = desc
+        thisObj.desc = desc;
         if (attribute == "major") {
             thisObj.getMajorData().sort((a, b) => {
                 if (desc == true) {
