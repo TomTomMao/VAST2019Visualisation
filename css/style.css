@@ -99,3 +99,11 @@
     stroke: black;
     opacity: 0.5;
 }
+
+.x-axis-minor {
+    color: rgb(224, 121, 3);
+}
+
+.x-axis-major {
+    color: rgb(0, 88, 170);
+}
