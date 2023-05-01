@@ -44,7 +44,7 @@ async function main() {
     areaChart = new AreaChart(config = AREACHART_CONFIG,
         data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax })
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
-        data = getBarChart2Data(data_long, tMin, tMax, "all"), major="meanDamageValue", minor="std")
+        data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
 }
 
@@ -124,13 +124,13 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
 
 
 // bar chart 2 functions
-function changeBarChart2(startTime, endTime, major, minor, order, desc, chart=barChart2) {
+function changeBarChart2(startTime, endTime, major, minor, order, desc, chart = barChart2) {
     // update bar chart, and update the bar chart title
-    chart.setData(getBarChart2Data(data_long, startTime, endTime, type="all"))
+    chart.setData(getBarChart2Data(data_long, startTime, endTime, type = "all"))
     chart.setMajor(major);
     chart.setMinor(minor);
-    chart.sort(order,desc)
-    
+    chart.sort(order, desc)
+
 }
 
 function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
@@ -155,8 +155,178 @@ function getBarChart2Data(sortedLongData, startTime, endTime, type = "all") {
     // return value looks like: [{location: str, type: int}]
 }
 
+// bar chart 1 functions
+
+function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location) {
+    /**
+     * return the data between the time startTime and endTime. Time is like: [startTime, startTime+timeLengthInMinutes) , [ startTime+timeLengthInMinutes, startTime+2*timeLengthInMinutes)... + [startTime+(n-1)*timeLengthInMinutes, endTime]
+     * if location == "all", the data only be filtered by the time,
+     * if location is an actual location, it would be filtered by both the location and time
+     * The filtered data would include the startTime and endTime.
+     * @param {Array} location must be one of the value in VALID_LOCATIONS, 
+     * @param {object} startTime a time object
+     * @param {object} endTime a time object
+     * @param {int} timeLengthInMinutes a int for time in minutes
+     * @param {str} dataType either be meanDamageValue, count, or std
+     * return: [{timeStartStr: "2020/04/07 11:10", 
+     *              timeEndStr:"2020/04/07 11:25", 
+     *              timeStart: parseTime("2020/04/07 11:10"), 
+     *              timeEnd: parseTime("2020/04/07 11:25"), 
+     *              dataType: meanDamageValue or count or std,
+     *              dataValue: int}]
+     */
+
+    // filter data step by step, first filter the location, then filtere the time.
+    let filteredData = sortedLongData; // The filteredData should always be sorted
+    console.log("copyed from sortedLongData:", filteredData)
+    if (DEVMODE == true && isSortedByTime(filteredData) == false) {
+        throw new Error("the data must be sorted by time")
+    }
+    if (DEVMODE == true && VALID_LOCATIONS.includes(location) == false) {
+        throw new Error
+    }
+    if (location != "all") {
+        // filter the data only with that location
+        filteredData = filteredData.filter((d) => d.location == location)
+    }
+    console.log("filtered location:", filteredData)
+
+    // check if filteredData is still sorted to avoid silent error.
+    if (DEVMODE == true && isSortedByTime(filteredData) == false) {
+        throw new Error("the data must be sorted by time")
+    }
+
+    // filter the time
+    filteredData = filteredData.filter((d) => {
+        return startTime <= d.time && d.time <= endTime
+    })
+    console.log("filtered by time, filteredData:", filteredData)
+
+    let intervals = createTimeInterval(startTime, endTime, timeLengthInMinutes);
+    console.log("intervals:", intervals);
+
+    let intervalPointer = 0;
+    filteredData.forEach((d) => {
+        // keep increment intervalPointer until the time in the intervals[intervalPointer] 
+        while (intervals[intervalPointer].isInside(d.time) == false) {
+            intervalPointer += 1;
+        } 
+        d.interval = intervals[intervalPointer]
+        d.timeIntervalStr = d.interval.toString()
+    })
+    // each entry of filteredData has a time Interval object and a timeIntervalStr
+    let getReducer = (dataType) => {
+        if (dataType=="meanDamageValue") {
+            return d3.mean
+        } else if (dataType=="count") {
+            return d3.count
+        } else if (dataType=="std") {
+            return d3.deviation
+        }
+    }
+    let rolled = d3.rollup(filteredData, v => getReducer(dataType)(v, d=>d.damageValue), d=>d.timeIntervalStr)
+    console.log("rolled", rolled)
+    return Array.from(rolled).map((d)=>{
+        return {timeStartStr: d[0], 
+                timeEndStr:d[0], 
+                timeStart: d[0], 
+                timeEnd: d[0], 
+                dataType: dataType,
+                dataValue: d[1]}
+    })
+}
 
 // helpers
+class TimeInterval {
+    constructor(start, end, leftInclude, rightInclude) {
+        this.startTime = start;
+        this.endTime = end;
+        this.leftInclude = leftInclude;
+        this.rightInclude = rightInclude;
+    }
+    isInside(time) {
+        let matchLeft;
+        let matchRight;
+        if (this.leftInclude == true) {
+            matchLeft = time >= this.startTime;
+        } else {
+            matchleft = time > this.startTime;
+        }
+        if (this.rightInclude == true) {
+            matchRight = time <= this.endTime;
+        } else {
+            matchRight = time < this.endTime;
+        }
+        return matchLeft && matchRight
+    }
+    getStartTime() {
+        return this.startTime
+    }
+    getEndTime() {
+        return this.endTime
+    }
+    toString() {
+        let timeToString = d3.timeFormat("%Y/%m/%d %H:%M");
+        let leftTime = timeToString(this.getStartTime());
+        let rightTime = timeToString(this.getEndTime());
+        if (this.leftInclude == true) {
+            var leftBracket = "[";
+        } else {
+            var leftBracket = "(";
+        }
+        if (this.rightInclude == true) {
+            var rightBracket = "]";
+        } else {
+            var rightBracket = ")";
+        }
+        return `${leftBracket}${leftTime}, ${rightTime}${rightBracket}`
+    }
+
+}
+function createTimeInterval(startTime, endTime, timeLengthInMinutes) {
+    /**
+     * @param {object} startTime a time object
+     * @param {object} endTime a time object
+     * @param {int} timeLengthInMinutes a int for time in minutes
+     * create an array of time span
+     * two cases
+     * If startTime > endTime: return an empty list
+     * CASE1 startTime + timeLengthInMinutes >= endTime: 
+     * [{startTime: startTime, endTime: endTime, leftInclude: true, rightInclude: true}]
+     * CASE2 startTime + timeLengthInMinutes < endTime:
+     * [
+     *    {startTime: startTime, endTime: startTime+timeLengthInMinutes, leftInclude: true, rightInclude: false}, 
+     *    {startTime: startTime+timeLengthInMinutes, endTime: startTime+2*timeLengthInMinutes, leftInclude: true, rightInclude: false}, 
+     *     ..., 
+     *    {startTime: startTime+(n-1)*timeLengthInMinutes, endTime: endTime, leftInclude: true, rightInclude: true}
+     * ]
+     * 
+     * return empty list
+    */
+
+    let intervals = []
+    if (startTime >= endTime) {
+        return []
+    }
+    if (d3.timeMinute.offset(startTime, timeLengthInMinutes) >= endTime) {
+        intervals.push(new TimeInterval(startTime, endTime, true, true))
+        console.log("flag1")
+    } else if (d3.timeMinute.offset(startTime, timeLengthInMinutes) < endTime) {
+        console.log("flag2")
+        let leftTime = startTime;
+        let rightTime = d3.timeMinute.offset(leftTime, timeLengthInMinutes);
+        while (rightTime < endTime) {
+            intervals.push(new TimeInterval(leftTime, rightTime, true, false))
+            leftTime = rightTime;
+            rightTime = d3.timeMinute.offset(rightTime, timeLengthInMinutes)
+        }
+        if (rightTime >= endTime) {
+            intervals.push(new TimeInterval(leftTime, endTime, true, true))
+        }
+    }
+    return intervals
+}
+
 function filterSortedDataByTime(sortedLongData, startTime, endTime) {
     /**
      * filter the data by time, time complexity is O(n)
