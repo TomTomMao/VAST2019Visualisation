@@ -150,11 +150,11 @@
     stroke: black;
 }
 
-.x-axis-minor {
+.x-axis-minor, #bar2Minor {
     color: rgb(224, 121, 3);
 }
 
-.x-axis-major {
+.x-axis-major, #bar2Major {
     color: rgb(0, 88, 170);
 }
 

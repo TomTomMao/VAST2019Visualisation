@@ -120,6 +120,17 @@ async function main() {
         changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "minor", false, barChart2)
         // console.log("bar2MinorAscending clicked")
     })
+    document.getElementById("bar2Major").addEventListener("change", function() {
+        let major = document.getElementById("bar2Major").value
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, major, barChart2.minor, barChart2.order, false, barChart2)
+        // console.log("bar2Major clicked")
+    })
+    document.getElementById("bar2Minor").addEventListener("change", function() {
+        let minor = document.getElementById("bar2Minor").value
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, minor, barChart2.order, false, barChart2)
+        // console.log("bar2Minor clicked")
+
+    })
 
 }
 

@@ -189,7 +189,7 @@ class BarChart2 extends BaseChart {
         } else if(attribute=="location"){
             console.log("sort by group name")
         } else {
-            throw new Error("invalid attribute for sorting barchart")
+            throw new Error(`invalid attribute for sorting barchart: ${attribute}`)
         }
         thisObj.updateVis()
     }
