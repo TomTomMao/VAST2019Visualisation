@@ -37,7 +37,7 @@
 .chart,
 .charts,
 .legends {
-    border: 1px black solid;
+    /* border: 1px black solid; */
 }
 
 #area-chart-title{
@@ -70,7 +70,7 @@
     background-color: rgb(212, 212, 212);
 }
 .rectangle:hover{
-    border: 1px black solid;
+    /* border: 1px black solid; */
     box-sizing: border-box;
 }
 .legend-button-1,.legend-button-2 {
@@ -80,7 +80,7 @@
     cursor: pointer;
 }
 .legend-button-1:hover,.legend-button-2:hover {
-    border: 1px black solid;
+    /* border: 1px black solid; */
 
 }
 .legend-button-1.selected {
