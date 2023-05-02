@@ -267,6 +267,7 @@ function barChart1brushedendCallBack(x1, x2) {
     changeLineChart(x1, x2, lineChart.getLocations(), lineChart);
     changeBarChart2(x1, x2, barChart2.major, barChart2.minor, barChart2.order, barChart2.desc, barChart2)
     changeAreaChart(x1, x2, areaChart.getLocation(), areaChart)
+    document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(x1)} to ${d3.timeFormat("%m-%d %H:%M")(x2)}`
     // console.log("barChart1brushedendCallBack",x1, x2)
 }
 function changeBarChart1(timeLengthInMinutes, dataType, location, facility, chart = barChart1) {

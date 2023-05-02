@@ -96,6 +96,19 @@
     background-color: aqua;
 }
 
+/* line chart tooltip */
+#line-chart-tooltip {
+    position: fixed;
+    width: 300px;
+    background-color: white;
+    opacity: 0.7;
+}
+
+.line-chart-tooltip-color-rect {
+    width: 1em;
+    height: 1em;
+}
+
 /* area chart */
 #area-chart-container {
     display:flex;
