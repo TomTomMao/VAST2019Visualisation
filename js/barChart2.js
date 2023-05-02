@@ -164,7 +164,7 @@ class BarChart2 extends BaseChart {
     }
     sort(attribute, desc = true) {
         /**
-         * @param {str} attribute "major" or "minor"
+         * @param {str} attribute "major" or "minor" or "location"
          */
         
         let thisObj = this;
@@ -186,6 +186,10 @@ class BarChart2 extends BaseChart {
                     return b[thisObj.minor] - a[thisObj.minor]
                 }
             })
+        } else if(attribute=="location"){
+            console.log("sort by group name")
+        } else {
+            throw new Error("invalid attribute for sorting barchart")
         }
         thisObj.updateVis()
     }

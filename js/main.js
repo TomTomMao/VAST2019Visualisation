@@ -48,7 +48,7 @@ async function main() {
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
         data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
-    document.getElementById("barChartValueType").addEventListener("change", function() {
+    document.getElementById("barChartValueType").addEventListener("change", function () {
         let barChartValueType = document.getElementById("barChartValueType").value;
         let barChartLocation = document.getElementById("barChartLocationFilter").value;
         let barChartFacility = document.getElementById("barChartFacilityFilter").value;
@@ -59,7 +59,9 @@ async function main() {
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
         changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
-    document.getElementById("barChartLocationFilter").addEventListener("change", function() {
+
+    // event listener of bar chart 1 buttons
+    document.getElementById("barChartLocationFilter").addEventListener("change", function () {
         let barChartValueType = document.getElementById("barChartValueType").value;
         let barChartLocation = document.getElementById("barChartLocationFilter").value;
         let barChartFacility = document.getElementById("barChartFacilityFilter").value;
@@ -70,7 +72,7 @@ async function main() {
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
         changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
-    document.getElementById("barChartFacilityFilter").addEventListener("change", function() {
+    document.getElementById("barChartFacilityFilter").addEventListener("change", function () {
         let barChartValueType = document.getElementById("barChartValueType").value;
         let barChartLocation = document.getElementById("barChartLocationFilter").value;
         let barChartFacility = document.getElementById("barChartFacilityFilter").value;
@@ -81,7 +83,7 @@ async function main() {
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
         changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
-    document.getElementById("barChartIntervalLength").addEventListener("change", function() {
+    document.getElementById("barChartIntervalLength").addEventListener("change", function () {
         let barChartValueType = document.getElementById("barChartValueType").value;
         let barChartLocation = document.getElementById("barChartLocationFilter").value;
         let barChartFacility = document.getElementById("barChartFacilityFilter").value;
@@ -92,7 +94,33 @@ async function main() {
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
         changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
-    
+
+    // event listener of bar chart 2 buttons
+    document.getElementById("bar2GroupNameDescending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "location", true, barChart2)
+        // console.log("bar2GroupNameDescending clicked")
+    })
+    document.getElementById("bar2GroupNameAscending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "location", false, barChart2)
+        // console.log("bar2GroupNameAscending clicked")
+    })
+    document.getElementById("bar2MajorDescending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "major", true, barChart2)
+        // console.log("bar2MajorDescending clicked")
+    })
+    document.getElementById("bar2MajorAscending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "major", false, barChart2)
+        // console.log("bar2MajorAscending clicked")
+    })
+    document.getElementById("bar2MinorDescending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "minor", true, barChart2)
+        // console.log("bar2MinorDescending clicked")
+    })
+    document.getElementById("bar2MinorAscending").addEventListener("click", function () {
+        changeBarChart2(lineChart.time.startTime, lineChart.time.endTime, barChart2.major, barChart2.minor, "minor", false, barChart2)
+        // console.log("bar2MinorAscending clicked")
+    })
+
 }
 
 // LINE chart functions
@@ -156,9 +184,9 @@ function getAreaChartData(sortedLongData, startTime, endTime, location) {
     let filteredData = filterSortedDataByTime(sortedLongData, startTime, endTime)
     if (location == "all") {
         let rolledData = d3.rollup(filteredData, v => d3.mean(v, d => d.damageValue), d => d.facility, d => d.timeStr);
-        let longData = Array.from(rolledData).map(d=>{
+        let longData = Array.from(rolledData).map(d => {
             return Array.from(d[1])
-                .map(e => { return {location: "all", facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1]}})
+                .map(e => { return { location: "all", facility: d[0], timeStr: e[0], time: parseTime(e[0]), meanDamageValue: e[1] } })
         }).flat();
         return longData;
     } else {
@@ -234,13 +262,13 @@ function changeBarChart1(timeLengthInMinutes, dataType, location, facility, char
     /**
      * change barchart1 's location, datatype
      */
-    console.log(timeLengthInMinutes, dataType, location, facility)
-    chart.data = getBarChart1Data(sortedLongData=data_long, startTime=tMin, endTime=tMax, timeLengthInMinutes=timeLengthInMinutes, dataType=dataType, location=location, facility=facility)
-    console.log(chart.data)
+    // console.log(timeLengthInMinutes, dataType, location, facility)
+    chart.data = getBarChart1Data(sortedLongData = data_long, startTime = tMin, endTime = tMax, timeLengthInMinutes = timeLengthInMinutes, dataType = dataType, location = location, facility = facility)
+    // console.log(chart.data)
     chart.updateVis()
 }
 
-function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location, facility="all") {
+function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinutes, dataType, location, facility = "all") {
     /**
      * return the data between the time startTime and endTime. Time is like: [startTime, startTime+timeLengthInMinutes) , [ startTime+timeLengthInMinutes, startTime+2*timeLengthInMinutes)... + [startTime+(n-1)*timeLengthInMinutes, endTime]
      * if location == "all", the data only be filtered by the time,
@@ -280,7 +308,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         filteredData = filteredData.filter((d) => d.facility == facility)
     }
     console.log("filtered by facility:", filteredData)
-    
+
     // check if filteredData is still sorted to avoid silent error.
     if (DEVMODE == true && isSortedByTime(filteredData) == false) {
         throw new Error("the data must be sorted by time")
@@ -288,7 +316,7 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
 
     // filter the time and facility
     filteredData = filteredData.filter((d) => {
-        return startTime <= d.time && d.time <= endTime 
+        return startTime <= d.time && d.time <= endTime
     })
     console.log("filtered by time, filteredData:", filteredData)
 

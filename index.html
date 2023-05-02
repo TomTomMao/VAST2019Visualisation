@@ -24,9 +24,9 @@
             <td>ValueType</td>
             <td>
               <select class="bar-selector" name="barChartValueType" id="barChartValueType">
-                <option value="count">count</option>
-                <option value="meanDamageValue">mean</option>
-                <option value="std">std</option>
+                <option value="count">number of reports</option>
+                <option value="meanDamageValue">mean damage value</option>
+                <option value="std">damage value deviation</option>
               </select>
             </td>
           </tr>
@@ -60,29 +60,29 @@
           <tr>
             <td>Facility</td>
             <td><select class="bar-selector" name="barChartFacilityFilter" id="barChartFacilityFilter">
-              <option value="all">all</option>
-              <option value="sewer_and_water">sewer_and_water</option>
-              <option value="power">power</option>
-              <option value="roads_and_bridges">roads_and_bridges</option>
-              <option value="medical">medical</option>
-              <option value="buildings">buildings</option>
-            </select></td>
+                <option value="all">all</option>
+                <option value="sewer_and_water">sewer_and_water</option>
+                <option value="power">power</option>
+                <option value="roads_and_bridges">roads_and_bridges</option>
+                <option value="medical">medical</option>
+                <option value="buildings">buildings</option>
+              </select></td>
           </tr>
           <tr>
             <td>Interval Length</td>
             <td><select class="bar-selector" name="barChartIntervalLength" id="barChartIntervalLength">
-              <option value="15">15 minutes</option>
-              <option value="30">30 minutes</option>
-              <option value="60">1 hour</option>
-              <option value="120">2 hours</option>
-              <option value="180">3 hours</option>
-              <option value="240">4 hours</option>
-              <option value="360">6 hours</option>
-              <option value="480">8 hours</option>
-              <option value="720">12 hours</option>
-              <option value="960">16 hours</option>
-              <option value="1440">24 hours</option>
-            </select></td>
+                <option value="15">15 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="120">2 hours</option>
+                <option value="180">3 hours</option>
+                <option value="240">4 hours</option>
+                <option value="360">6 hours</option>
+                <option value="480">8 hours</option>
+                <option value="720">12 hours</option>
+                <option value="960">16 hours</option>
+                <option value="1440">24 hours</option>
+              </select></td>
           </tr>
         </table>
       </div>
@@ -103,7 +103,58 @@
       </h2>
       <div class="chart" id="bar-chart-2-container">
         <svg id="bar-chart-2-svg"></svg>
-        <div class="legends" id="bar-chart-legends"></div>
+        <div class="legends" id="bar-chart-legends">
+          <table>
+            <tr>
+              <td>
+                <button id="bar2GroupNameDescending">group name (descending)</button>
+              </td>
+              <td>
+                <button id="bar2GroupNameAscending">group name (ascending)</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button id="bar2MajorDescending">Major (descending)</button>
+              </td>
+              <td>
+                <button id="bar2MajorAscending">Major (ascending)</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button id="bar2MinorDescending">Minor (descending)</button>
+              </td>
+              <td>
+                <button id="bar2MinorAscending">Minor (ascending)</button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Major Axis:
+              </td>
+              <td>
+                <select name="bar2Major" id="bar2Major">
+                  <option value="meanDamageValue">mean damage value</option>
+                  <option value="count">report count</option>
+                  <option value="std">damage value standard deviation</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Minor Axis:
+              </td>
+              <td>
+                <select name="bar2Minor" id="bar2Minor">
+                  <option value="count">report count</option>
+                  <option value="meanDamageValue">mean damage value</option>
+                  <option value="std">damage value standard deviation</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>
