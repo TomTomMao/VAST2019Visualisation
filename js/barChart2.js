@@ -41,6 +41,8 @@ class BarChart2 extends BaseChart {
         thisObj.yAxis = d3.axisLeft(thisObj.yScale)
         // y axis group
         thisObj.yAxisG = thisObj.chart.append("g").attr("class", "axis y-axis")
+        thisObj.bar1G = thisObj.chart.append("g");
+        thisObj.bar2G = thisObj.chart.append("g");
         thisObj.sort("major", true); // set order
         thisObj.updateVis();
     }
@@ -80,7 +82,7 @@ class BarChart2 extends BaseChart {
 
         // render bars, partially reference: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
         // major bar
-        thisObj.chart.selectAll(".major-bar")
+        thisObj.bar1G.selectAll(".major-bar")
             .data(thisObj.getMajorData())
             .join('rect')
             .attr('class', 'major-bar')
@@ -94,7 +96,7 @@ class BarChart2 extends BaseChart {
             })
 
         // minor bar
-        thisObj.chart.selectAll(".minor-bar")
+        thisObj.bar2G.selectAll(".minor-bar")
             .data(thisObj.getMinorData())
             .join('rect')
             .attr('class', 'minor-bar')
