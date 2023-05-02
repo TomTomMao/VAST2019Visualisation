@@ -1,93 +1,172 @@
-body {
-  padding: 30px;
+* {
+    box-sizing: border-box;
+}
+/* mian */
+.main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin:1em auto;
+}
+
+/* left */
+#left-charts-container {
+    width: 1250px;
+    height: 900px;
+    
 }
 
 
-/* chart column */
-.chartsColumns {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  height: 600px;
+#line-chart-legends {
+    height: 400px;
 }
 
-.chartsColumn {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 600px;
-  border: black 1px solid;
+#bar-chart-1-container {
+    height: 120px;
 }
 
 
-/* line chart lay out */
-#lineChart {
-  display: flex;
-  flex-direction: row;
+#bar-chart-1-container {
+    width: 1200px;
 }
 
-/*  line chart svg */
-.mean-line {
-  fill: none;
-  stroke: black;
-  stroke-width: 1px;
+#line-chart-legends {
+    width: 200px;
 }
 
-
-.location-line {
-  fill: none;
-  stroke-width: 1px;
+.chart,
+.charts,
+.legends {
+    /* border: 1px black solid; */
 }
 
+#area-chart-title{
+    text-align: center;
+}
 
-/* line chart tooltip */
-#lineChartToolTip {
-  position: absolute;
-  background: white;
-  border: black 1px solid;
-  display: hidden;
+/* linechart */
+
+#line-chart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 /* linechart legend */
+.line-chart-legends {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 .line-chart-legend {
-  width: 20px;
-  text-align: center;
+    padding-left: 2em;
+    display: flex;
+    flex-direction: row;
 }
-  
-.lineChartLocationButton {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 120px;
-  cursor: pointer;
-  padding-left:1em;
+.rectangle {
+    width: 1em;
+    height:1em;
+    margin-right: 0.3em;
+    background-color: rgb(212, 212, 212);
+}
+.rectangle:hover{
+    border: 1px black solid;
+    box-sizing: border-box;
+}
+.legend-button-1,.legend-button-2 {
+    left: 1em;
+    height: 1em;
+    background-color:beige;
+    cursor: pointer;
+}
+.legend-button-1:hover,.legend-button-2:hover {
+    border: 1px black solid;
+}
+.legend-button-1.selected {
+    background-color: black;
+    box-sizing: border-box;
+}
+.legend-text {
+    margin-left: 1em
+}
+/* #legend-button-2-all {
+    cursor:not-allowed;
+} */
+.legend-button-2 {
+    background-color: aqua;
 }
 
-.lineChartLocationButton:hover {
-  border: black 1px solid;
-  border-radius: 5px;
+/* line chart tooltip */
+#line-chart-tooltip {
+    position: fixed;
+    width: 300px;
+    background-color: white;
+    opacity: 0.7;
 }
 
-.lineChartColourLegend {
-  width: 1em;
-  height: 1em;
-  margin-right: 0.5em;
+.line-chart-tooltip-color-rect {
+    width: 1em;
+    height: 1em;
 }
 
-#lineChartLegend {
-  width: 140px;
-  border: black 1px solid;
+/* area chart */
+#area-chart-container {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-/* bar chart */
-#barChartContext {
-  display: flex;
-  flex-direction: row;
+#area-chart-svg {
+    width: 1000px;
 }
 
-/* stack area chart */
+#area-chart-legends{
+    width: 200px;
+    height: 220px;
+}
 
-#stackedAreaChart {
-  display: flex;
-  flex-direction: row;
+/* right */
+#right-charts-container {
+    width: 550px;
+    height: 900px;
+}
+
+#bar-chart-2-title{
+    margin: 0;
+    text-align: center;
+}
+#bar-chart-2-container {
+    height: 840px;
+    width: 500px;
+}
+
+
+/* bar chart 1 */
+.bar {
+    fill: black;
+    stroke: black;
+}
+#bar-chart-1-container {
+    display: flex;
+    flex-direction: left   ;
+}
+/* bar chart 2*/
+.major-bar {
+    fill: rgb(0, 88, 170);
+    stroke-width: 2px;
+    stroke: black;
+}
+
+.minor-bar {
+    fill: rgb(224, 121, 3);
+    stroke-width: 2px;
+    stroke: black;
+}
+
+.x-axis-minor, #bar2Minor, #bar2MinorDescending, #bar2MinorAscending {
+    color: rgb(224, 121, 3);
+}
+
+.x-axis-major, #bar2Major, #bar2MajorDescending, #bar2MajorAscending {
+    color: rgb(0, 88, 170);
 }
