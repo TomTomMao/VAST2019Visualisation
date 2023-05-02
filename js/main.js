@@ -57,7 +57,7 @@ async function main() {
         console.log("barChartLocation changed, value:", barChartLocation);
         console.log("barChartFacility changed, value:", barChartFacility);
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
-        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
     document.getElementById("barChartLocationFilter").addEventListener("change", function() {
         let barChartValueType = document.getElementById("barChartValueType").value;
@@ -68,7 +68,7 @@ async function main() {
         console.log("barChartLocation changed, value:", barChartLocation);
         console.log("barChartFacility changed, value:", barChartFacility);
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
-        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
     document.getElementById("barChartFacilityFilter").addEventListener("change", function() {
         let barChartValueType = document.getElementById("barChartValueType").value;
@@ -79,7 +79,7 @@ async function main() {
         console.log("barChartLocation changed, value:", barChartLocation);
         console.log("barChartFacility changed, value:", barChartFacility);
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
-        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
     document.getElementById("barChartIntervalLength").addEventListener("change", function() {
         let barChartValueType = document.getElementById("barChartValueType").value;
@@ -90,7 +90,7 @@ async function main() {
         console.log("barChartLocation changed, value:", barChartLocation);
         console.log("barChartFacility changed, value:", barChartFacility);
         console.log("barChartIntervalLength changed, value:", barChartIntervalLength);
-        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation)
+        changeBarChart1(barChartIntervalLength, barChartValueType, barChartLocation, barChartFacility)
     })
     
 }
@@ -230,11 +230,13 @@ function barChart1brushedendCallBack(x1, x2) {
     changeAreaChart(x1, x2, areaChart.getLocation(), areaChart)
     // console.log("barChart1brushedendCallBack",x1, x2)
 }
-function changeBarChart1(timeLengthInMinutes, dataType, location, chart = barChart1) {
+function changeBarChart1(timeLengthInMinutes, dataType, location, facility, chart = barChart1) {
     /**
      * change barchart1 's location, datatype
      */
-    chart.data = getBarChart1Data(data_long, tMin, tMax, timeLengthInMinutes, dataType, location)
+    console.log(timeLengthInMinutes, dataType, location, facility)
+    chart.data = getBarChart1Data(sortedLongData=data_long, startTime=tMin, endTime=tMax, timeLengthInMinutes=timeLengthInMinutes, dataType=dataType, location=location, facility=facility)
+    console.log(chart.data)
     chart.updateVis()
 }
 
@@ -271,12 +273,14 @@ function getBarChart1Data(sortedLongData, startTime, endTime, timeLengthInMinute
         // filter the data only with that location
         filteredData = filteredData.filter((d) => d.location == location)
     }
+    console.log("filtered by location:", filteredData)
     if (facility != "all") {
         // filter the data only with that facility
+        console.log("facility != all")
         filteredData = filteredData.filter((d) => d.facility == facility)
     }
-    // console.log("filtered location:", filteredData)
-
+    console.log("filtered by facility:", filteredData)
+    
     // check if filteredData is still sorted to avoid silent error.
     if (DEVMODE == true && isSortedByTime(filteredData) == false) {
         throw new Error("the data must be sorted by time")

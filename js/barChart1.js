@@ -44,10 +44,11 @@ class BarChart1 extends BaseChart {
         thisObj.getX2 = (d) => d.timeEnd;
         thisObj.getY = (d) => d.dataValue;
 
-        thisObj.xScale.domain([
-            d3.min(thisObj.data, thisObj.getX1),
-            d3.max(thisObj.data, thisObj.getX2)
-        ])
+        // thisObj.xScale.domain([
+        //     d3.min(thisObj.data, thisObj.getX1),
+        //     d3.max(thisObj.data, thisObj.getX2)
+        // ])
+        thisObj.xScale.domain(d3.extent(data_long, (d)=>d.time))
         thisObj.yScale.domain(d3.extent(thisObj.data, thisObj.getY))
         this.renderVis();
     }
