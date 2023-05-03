@@ -21,3 +21,4 @@ lineChart.js:
 
 main.js:
     I reference the algorithm from this page for the isSortedArray() function: https://codehandbook.org/check-if-an-array-sorted-javascript/
+    I downloaded the d3.v6.min.js from here: https://d3js.org/d3.v6.min.js, I found this from here: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/1_d3_tutorial
