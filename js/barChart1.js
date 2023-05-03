@@ -70,11 +70,13 @@ class BarChart1 extends BaseChart {
         thisObj.yAxisG.call(thisObj.yAxis);
     }
     brushed ({selection}) {
+        // reference for the brusher: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/4_d3_tutorial
         let thisObj = this;
         let [x1, x2] = selection.map(thisObj.xScale.invert, thisObj.xScale);
         thisObj.callbacks.brushedCallback(x1, x2)
     }
     brushedend({selection}) {
+        // reference for the brusher: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/4_d3_tutorial
         let thisObj = this;
         let [x1, x2] = selection.map(thisObj.xScale.invert, thisObj.xScale);
         thisObj.callbacks.brushedendCallback(x1, x2)
