@@ -45,8 +45,10 @@ async function main() {
         data = getAreaChartData(data_long, tMin, tMax, "1"), { startTime: tMin, endTime: tMax }, "all")
     barChart1 = new BarChart1(config = BARCHART1_CONFIG,
         data = getBarChart1Data(data_long, tMin, tMax, DEFAULT_BAR_CHART_1_INTERVAL_LENGTH, "count", "all"), { brushedCallback: barChart1brushedCallBack, brushedendCallback: barChart1brushedendCallBack })
+    let barChart2Major = document.getElementById("bar2Major").value;
+    let barChart2Minor = document.getElementById("bar2Minor").value;
     barChart2 = new BarChart2(config = BARCHART2_CONFIG,
-        data = getBarChart2Data(data_long, tMin, tMax, "all"), major = "meanDamageValue", minor = "std")
+        data = getBarChart2Data(data_long, tMin, tMax, "all"), major = barChart2Major, minor = barChart2Minor)
     document.querySelector(barChart2.config.titleElementId).innerHTML = `Aggregated Damage & Uncertainty<br>Between ${d3.timeFormat("%m-%d %H:%M")(tMin)} to ${d3.timeFormat("%m-%d %H:%M")(tMax)}`
     document.getElementById("barChartValueType").addEventListener("change", function () {
         let barChartValueType = document.getElementById("barChartValueType").value;

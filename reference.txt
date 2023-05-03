@@ -1,0 +1,23 @@
+Note, although I referenced the web pages, but it was not copy pasting the code.
+areaChart.js:
+    areachart referenced this: https://d3-graph-gallery.com/graph/stackedarea_basic.html
+
+barChart1.js:
+the brusher on the bar chart referenced this: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/4_d3_tutorial
+rendering rectangles on bar chart referenced this: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
+
+barChart2.js:
+    referenced this when creating barChart2:  https://www.tutorialsteacher.com/d3js/create-bar-chart-using-d3js?utm_content=cmp-true
+    referenced this when creating bar chart 2: https://github.com/michael-oppermann/d3-learning-material/blob/main/d3-examples/d3-interactive-bar-chart/js/barchart.js
+
+baseChart.js:
+    the idea of initvis, updatevis rendervis lifecylce comes from this tutorial: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/2_d3_tutorial
+
+lineChart.js:
+    line chart referenced this: https://michaeloppermann.com/d3-example/d3-interactive-line-chart
+    this tutorial helped me make tooltip: https://github.com/michael-oppermann/d3-learning-material/tree/main/d3-tutorials/3_d3_tutorial#tooltips
+    this article taught me how to make multiple line: https://d3-graph-gallery.com/graph/line_several_group.html
+    I referenced this example when putting markers on the line chart: https://codesandbox.io/s/github/UBC-InfoVis/2021-436V-examples/tree/master/d3-interactive-line-chart
+
+main.js:
+    I reference the algorithm from this page for the isSortedArray() function: https://codehandbook.org/check-if-an-array-sorted-javascript/
